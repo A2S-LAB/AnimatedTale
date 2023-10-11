@@ -1,0 +1,10 @@
+controller:
+  MODE: video_render
+  OUTPUT_VIDEO_PATH: /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/el/video.gif
+scene:
+  ANIMATED_CHARACTERS:
+  - character_cfg: /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/el/char_cfg.yaml
+    motion_cfg: /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/config/motion/wave_hello.yaml
+    retarget_cfg: /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/config/retarget/fair1_ppf.yaml
+view:
+  USE_MESA: true

@@ -1,0 +1,21 @@
+# 핑 먼저 확인하고, 핑이 안좋으면 컨테이너 재시작
+curl http://localhost:8080/ping
+
+# 실행중인 프로세스 확인
+docker ps -a
+
+# 컨테이너 stop
+docker stop docker_torchserve
+
+# docker 재시작
+sudo systemctl daemon-reload 
+sudo systemctl restart docker
+
+# 컨테이너 start
+docker start docker_torchserve
+
+
+
+
+# 이건 실행 ㄴㄴ
+docker run -d --name docker_torchserve -p 8080:8080 -p 8081:8081 docker_torchserve
