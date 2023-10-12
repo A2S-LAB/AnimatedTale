@@ -159,6 +159,12 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
         cv2.putText(joint_overlay, name, (int(x), int(y+15)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, 2)
     cv2.imwrite(str(outdir/'joint_overlay.png'), joint_overlay)
 
+    return {
+        "cropped": 'texture.png',
+        "mask": 'mask.png',
+        "joint_overlay":'joint_overlay.png'
+    }
+
 
 def segment(img: np.ndarray):
     """ threshold """

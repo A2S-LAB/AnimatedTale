@@ -4782,3 +4782,271 @@ INFO:root:invalid frame_idx (504), replacing with last frame 503
 INFO:root:Rendered 504 frames in 6.501842737197876 seconds.
 INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/test/video.gif
 INFO:root:Wrote video to file in in 2.199252128601074 seconds.
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:8080
+DEBUG:urllib3.connectionpool:http://localhost:8080 "POST /predictions/drawn_humanoid_pose_estimator HTTP/1.1" 200 1651
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 5625d6d8bb00 at 0x7f95fb9e8be0>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+INFO:root:Starting joint -> mask pixel BFS
+INFO:root:Finished joint -> mask pixel BFS in 1.2968220710754395 seconds
+INFO:root:Using BVH file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/bvh/fair1/jumping.bvh
+INFO:root:Upper Limbs projection_method is pca. Running PCA on ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'RightHandEnd', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'LeftHandEnd']
+INFO:root:PCA complete. Upper Limbs using [1. 0. 0.]
+INFO:root:Lower Limbs projection_method is pca. Running PCA on ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']
+INFO:root:PCA complete. Lower Limbs using [0. 0. 1.]
+INFO:root:Trunk projection_method is frontal. Using [1. 0. 0.]
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: RightHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: LeftHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+WARNING:root:point [[0.5201005  0.15829146]] not inside or on edge of any triangle in mesh. Skipping it
+WARNING:root:point [[0.5201005  0.07788945]] not inside or on edge of any triangle in mesh. Skipping it
+INFO:root:tA1xA1 is singular. perturbing...
+INFO:root:tA2xA2 is singular. perturbing...
+INFO:root: Writing video to: /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+WARNING:root:Specified duration of .gif is too low, replacing with 20: 8
+INFO:root:invalid frame_idx (504), replacing with last frame 503
+INFO:root:Rendered 504 frames in 12.01392412185669 seconds.
+INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+INFO:root:Wrote video to file in in 2.159670352935791 seconds.
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 55a188901270 at 0x7ff6f573d100>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+CRITICAL:root:Could not find joint1 in runtime check: right_shoulder
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 55d86dcbc270 at 0x7fd30cb05130>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+CRITICAL:root:Could not find joint1 in runtime check: right_shoulder
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 55c322e26270 at 0x7f40b5af1130>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+INFO:root:Starting joint -> mask pixel BFS
+INFO:root:Finished joint -> mask pixel BFS in 1.2960231304168701 seconds
+INFO:root:Using BVH file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/bvh/fair1/dab.bvh
+INFO:root:Upper Limbs projection_method is pca. Running PCA on ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'RightHandEnd', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'LeftHandEnd']
+INFO:root:PCA complete. Upper Limbs using [1. 0. 0.]
+INFO:root:Lower Limbs projection_method is pca. Running PCA on ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']
+INFO:root:PCA complete. Lower Limbs using [1. 0. 0.]
+INFO:root:Trunk projection_method is frontal. Using [1. 0. 0.]
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: RightHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: LeftHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root:tA1xA1 is singular. perturbing...
+INFO:root:tA2xA2 is singular. perturbing...
+INFO:root: Writing video to: /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+INFO:root:invalid frame_idx (339), replacing with last frame 338
+INFO:root:Rendered 339 frames in 7.888142824172974 seconds.
+INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+INFO:root:Wrote video to file in in 1.454838752746582 seconds.
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 564227c71270 at 0x7fce04ea7130>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+INFO:root:Starting joint -> mask pixel BFS
+INFO:root:Finished joint -> mask pixel BFS in 1.3115472793579102 seconds
+INFO:root:Using BVH file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/bvh/fair1/zombie.bvh
+INFO:root:Upper Limbs projection_method is pca. Running PCA on ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'RightHandEnd', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'LeftHandEnd']
+INFO:root:PCA complete. Upper Limbs using [1. 0. 0.]
+INFO:root:Lower Limbs projection_method is pca. Running PCA on ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']
+INFO:root:PCA complete. Lower Limbs using [0. 0. 1.]
+INFO:root:Trunk projection_method is frontal. Using [1. 0. 0.]
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: RightHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: LeftHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root:tA1xA1 is singular. perturbing...
+INFO:root:tA2xA2 is singular. perturbing...
+INFO:root: Writing video to: /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+INFO:root:invalid frame_idx (779), replacing with last frame 778
+INFO:root:Rendered 779 frames in 18.748064756393433 seconds.
+INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+INFO:root:Wrote video to file in in 2.2659850120544434 seconds.
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 563bfe1bf270 at 0x7f1daae80130>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+INFO:root:Starting joint -> mask pixel BFS
+INFO:root:Finished joint -> mask pixel BFS in 1.2951500415802002 seconds
+INFO:root:Using BVH file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/bvh/fair1/jumping.bvh
+INFO:root:Upper Limbs projection_method is pca. Running PCA on ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'RightHandEnd', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'LeftHandEnd']
+INFO:root:PCA complete. Upper Limbs using [1. 0. 0.]
+INFO:root:Lower Limbs projection_method is pca. Running PCA on ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']
+INFO:root:PCA complete. Lower Limbs using [0. 0. 1.]
+INFO:root:Trunk projection_method is frontal. Using [1. 0. 0.]
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: RightHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: LeftHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root:tA1xA1 is singular. perturbing...
+INFO:root:tA2xA2 is singular. perturbing...
+INFO:root: Writing video to: /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+WARNING:root:Specified duration of .gif is too low, replacing with 20: 8
+INFO:root:invalid frame_idx (504), replacing with last frame 503
+INFO:root:Rendered 504 frames in 11.945027112960815 seconds.
+INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+INFO:root:Wrote video to file in in 2.219390630722046 seconds.
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 55914afe6270 at 0x7fe3c1a18100>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+INFO:root:Starting joint -> mask pixel BFS
+INFO:root:Finished joint -> mask pixel BFS in 1.2707197666168213 seconds
+INFO:root:Using BVH file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/bvh/fair1/dab.bvh
+INFO:root:Upper Limbs projection_method is pca. Running PCA on ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'RightHandEnd', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'LeftHandEnd']
+INFO:root:PCA complete. Upper Limbs using [1. 0. 0.]
+INFO:root:Lower Limbs projection_method is pca. Running PCA on ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']
+INFO:root:PCA complete. Lower Limbs using [1. 0. 0.]
+INFO:root:Trunk projection_method is frontal. Using [1. 0. 0.]
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: RightHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: LeftHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root:tA1xA1 is singular. perturbing...
+INFO:root:tA2xA2 is singular. perturbing...
+INFO:root: Writing video to: /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+INFO:root:invalid frame_idx (339), replacing with last frame 338
+INFO:root:Rendered 339 frames in 8.212316513061523 seconds.
+INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/test/video.gif
+INFO:root:Wrote video to file in in 1.5228676795959473 seconds.
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 559f78e8ede0 at 0x7f853be0a130>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+INFO:root:Starting joint -> mask pixel BFS
+INFO:root:Finished joint -> mask pixel BFS in 0.579125165939331 seconds
+INFO:root:Using BVH file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/bvh/fair1/wave_hello.bvh
+INFO:root:Upper Limbs projection_method is pca. Running PCA on ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'RightHandEnd', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'LeftHandEnd']
+INFO:root:PCA complete. Upper Limbs using [1. 0. 0.]
+INFO:root:Lower Limbs projection_method is pca. Running PCA on ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']
+INFO:root:PCA complete. Lower Limbs using [1. 0. 0.]
+INFO:root:Trunk projection_method is frontal. Using [1. 0. 0.]
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: RightHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: LeftHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+WARNING:root:point [[0.24595469 0.8365696 ]] not inside or on edge of any triangle in mesh. Skipping it
+WARNING:root:point [[0.25566342 0.3381877 ]] not inside or on edge of any triangle in mesh. Skipping it
+INFO:root:tA1xA1 is singular. perturbing...
+INFO:root:tA2xA2 is singular. perturbing...
+INFO:root: Writing video to: /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/video.gif
+WARNING:root:Specified duration of .gif is too low, replacing with 20: 8
+INFO:root:invalid frame_idx (839), replacing with last frame 838
+INFO:root:Rendered 839 frames in 17.003153085708618 seconds.
+INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/video.gif
+INFO:root:Wrote video to file in in 3.60980224609375 seconds.
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:8080
+DEBUG:urllib3.connectionpool:http://localhost:8080 "POST /predictions/drawn_humanoid_pose_estimator HTTP/1.1" 200 1530
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 56223e77c0b0 at 0x7fd33cbadc10>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+INFO:root:Starting joint -> mask pixel BFS
+INFO:root:Finished joint -> mask pixel BFS in 2.6010076999664307 seconds
+INFO:root:Using BVH file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/bvh/fair1/jumping.bvh
+INFO:root:Upper Limbs projection_method is pca. Running PCA on ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'RightHandEnd', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'LeftHandEnd']
+INFO:root:PCA complete. Upper Limbs using [1. 0. 0.]
+INFO:root:Lower Limbs projection_method is pca. Running PCA on ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']
+INFO:root:PCA complete. Lower Limbs using [0. 0. 1.]
+INFO:root:Trunk projection_method is frontal. Using [1. 0. 0.]
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: RightHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: LeftHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root:tA1xA1 is singular. perturbing...
+INFO:root:tA2xA2 is singular. perturbing...
+INFO:root: Writing video to: /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/video.gif
+WARNING:root:Specified duration of .gif is too low, replacing with 20: 8
+INFO:root:invalid frame_idx (504), replacing with last frame 503
+INFO:root:Rendered 504 frames in 14.321869373321533 seconds.
+INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/video.gif
+INFO:root:Wrote video to file in in 2.1930465698242188 seconds.
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:8080
+DEBUG:urllib3.connectionpool:http://localhost:8080 "POST /predictions/drawn_humanoid_pose_estimator HTTP/1.1" 200 1530
+INFO:root:Using user-specified mvc config file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/mvc_cfg.yaml
+DEBUG:OpenGL.platform.ctypesloader:Loaded libOSMesa.so => libOSMesa.so <CDLL 'libOSMesa.so', handle 559d25bd5c90 at 0x7fc49c1d4c10>
+DEBUG:OpenGL.acceleratesupport:OpenGL_accelerate module loaded
+DEBUG:OpenGL.arrays.arraydatatype:Using accelerated ArrayDatatype
+INFO:root:2 separate polygons found in mask. Using largest.
+INFO:root:Encountered values close to zero in vector norm. Replacing with 1e-05
+INFO:root:Starting joint -> mask pixel BFS
+INFO:root:Finished joint -> mask pixel BFS in 2.5134174823760986 seconds
+INFO:root:Using BVH file located at /home/dcvlab/dcv/Coco/AnimatedTale/examples/bvh/fair1/wave_hello.bvh
+INFO:root:Upper Limbs projection_method is pca. Running PCA on ['RightShoulder', 'RightArm', 'RightForeArm', 'RightHand', 'RightHandEnd', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftHand', 'LeftHandEnd']
+INFO:root:PCA complete. Upper Limbs using [1. 0. 0.]
+INFO:root:Lower Limbs projection_method is pca. Running PCA on ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase']
+INFO:root:PCA complete. Lower Limbs using [1. 0. 0.]
+INFO:root:Trunk projection_method is frontal. Using [1. 0. 0.]
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: RightHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: LeftHandThumb1
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root: error finding projection plane for joint_name: End Site
+INFO:root:tA1xA1 is singular. perturbing...
+INFO:root:tA2xA2 is singular. perturbing...
+INFO:root: Writing video to: /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/video.gif
+WARNING:root:Specified duration of .gif is too low, replacing with 20: 8
+INFO:root:invalid frame_idx (839), replacing with last frame 838
+INFO:root:Rendered 839 frames in 22.489508867263794 seconds.
+INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/dorosi/video.gif
+INFO:root:Wrote video to file in in 3.711864709854126 seconds.

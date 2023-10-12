@@ -32,7 +32,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 3:
         motion_cfg_fn = sys.argv[3]
     else:
-        motion_cfg_fn = resource_filename(__name__, 'config/motion/jumping.yaml')
+        motion_cfg_fn = resource_filename(__name__, 'config/motion/wave_hello.yaml')
     if len(sys.argv) > 4:
         retarget_cfg_fn = sys.argv[4]
     else:

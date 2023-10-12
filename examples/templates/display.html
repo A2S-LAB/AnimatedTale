@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Display</title>
+    <style>
+        /* 이미지들을 가로로 나열하기 위한 스타일 */
+        .images {
+            display: flex;
+            justify-content: space-between;
+        }
+        img {
+            margin: 10px;
+            max-width: 70%; /* 각 이미지의 최대 너비를 30%로 설정. 필요에 따라 조절 가능 */
+        }
+    </style>
+</head>
+<body>
+    <div class="images">
+        <div>
+            <h3>Cropped Image:</h3>
+            <img src="/get_image/web_test/{{ images.cropped }}" alt="Cropped Image">
+        </div>
+
+        <div>
+            <h3>Mask Image:</h3>
+            <img src="/get_image/web_test/{{ images.mask }}" alt="Mask Image">
+        </div>
+
+        <div>
+            <h3>Joint Overlay:</h3>
+            <img src="/get_image/web_test/{{ images.joint_overlay }}" alt="Joint Overlay">
+        </div>
+    </div>
+</body>
+</html>

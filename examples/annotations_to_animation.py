@@ -54,7 +54,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         motion_cfg_fn = sys.argv[2]
     else:
-        motion_cfg_fn = resource_filename(__name__, 'config/motion/dab.yaml')
+        motion_cfg_fn = resource_filename(__name__, 'config/motion/wave_hello.yaml')
     if len(sys.argv) > 3:
         retarget_cfg_fn = sys.argv[3]
     else:
