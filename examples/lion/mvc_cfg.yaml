@@ -1,0 +1,13 @@
+scene:
+  ANIMATED_CHARACTERS:
+  - character_cfg: /home/dcvlab/dcv/Coco/AnimatedTale/examples/lion/char_cfg.yaml
+    motion_cfg: /home/dcvlab/dcv/Coco/AnimatedTale/examples/config/motion/zombie.yaml
+    retarget_cfg: /home/dcvlab/dcv/Coco/AnimatedTale/examples/config/retarget/four_legs.yaml
+view:
+  CAMERA_POS: [0.1, 1.3, 2.7]
+  WINDOW_DIMENSIONS: [800, 600]
+  BACKGROUND_IMAGE: /home/dcvlab/dcv/Coco/AnimatedTale/examples/drawings/room.png
+controller:
+  MODE: video_render
+  OUTPUT_VIDEO_PATH: ./video.mp4
+  OUTPUT_VIDEO_CODEC: avc1

@@ -1,13 +1,340 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Upload Image</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/get_image/web_contents/AT_Logo.ico" type="image/x-icon">
+    <title>Animated Tale</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif;
+            background-color: #F7E0D3;
+            background-image: url('https://www.transparenttextures.com/patterns/sketch.png');
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    
+        .title {
+            text-align: center;
+            font-size: 5vw;
+            color: #333;
+            text-shadow: 0.25vw 0.25vw 0.5vw rgba(0, 0, 0, 0.5);
+            margin: 3vh 0 1.5vh 0;
+            animation: bounce 1s infinite;
+        }
+
+        .canvas-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.5);
+            flex-direction: column;
+            margin-bottom: 5vh; /* Adjusted margin for visual balance */
+        }
+
+        form {
+            position: absolute;
+            bottom: 2vh; /* Adjusted for better spacing from the bottom */
+            right: 1vw;
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            flex-direction: row;
+            gap: 1vw;
+        }
+
+        .canvas {
+            position: relative;
+            width: 60vw;
+            height: 70vh;
+            background-color: white;
+            border: 0.1vw solid #ccc;
+            box-shadow: 0 0.4vw 0.8vw rgba(0, 0, 0, 0.1);
+            padding: 2vh;
+            text-align: center;
+            margin-top: 1.5vh;
+            border-radius: 1.5vw;
+        }
+    
+        img {
+            height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /*----------------------------------------*/
+        form {
+            position: absolute;
+            bottom: 1vh;
+            right: 20vw;
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            flex-direction: row;
+            gap: 1vw;
+        }
+        form input[type="file"], form input[type="submit"] {
+            font-size: 1.1vw;
+            padding: 1.1vh 1.5vw;
+            margin-bottom: 1vh;
+            border: 0.08vw solid #ccc;
+            border-radius: 0.4vw;
+            cursor: pointer;
+            width: auto;
+        }
+        .btn-common {
+            font-size: 1.1vw;
+            padding: 1.1vh 1.5vw;
+            border: 0.08vw solid #ccc;
+            border-radius: 0.4vw;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-upload {
+            background-color: #333;
+            color: #FFF;
+        }
+        .btn-upload:hover {
+            background-color: #555;
+        }
+        .btn-submit {
+            background-color: #87CEFA;
+            border-color: #87CEFA;
+            color: white;
+            box-shadow: 0 0.3vw 0.6vw rgba(0, 0, 0, 0.1);
+            width: auto;
+        }
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .upload-btn-wrapper .btn-common {
+            position: relative;
+            z-index: 1;
+        }
+        .upload-btn-wrapper input[type=file] {
+            font-size: 1.1vw;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;  /* Ensure it covers the entire button */
+            height: 100%; /* Ensure it covers the entire button */
+            cursor: pointer; /* Make sure the cursor is a pointer over the invisible input */
+            z-index: 2;
+            opacity: 0;  
+        }
+        .btn-upload {
+            background-color: #333;
+            color: #FFF;
+            border: 0.08vw solid #ccc;
+            border-radius: 0.4vw;
+            padding: 1.1vh 1.5vw;
+            font-size: 1.1vw;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-upload:hover {
+            background-color: #555;
+        }
+
+
+        /* ------------- decos----------------------*/
+        .balloon {
+            position: absolute;
+            bottom: 10vh;
+            animation: float 3s infinite, drift 2s infinite;
+            opacity: 0.8;
+            z-index: -1;
+        }
+        .doodle {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: transparent;
+            border-radius: 50%;
+            z-index: -1;
+        }
+        .doodle.circle {
+            border: 2px solid #FF5733;
+            animation: doodleAnimation 5s infinite alternate;
+        }
+        @keyframes doodleAnimation {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+        .doodle.line {
+            width: 150px;
+            height: 5px;
+            background-color: #33FF57;
+            transform: rotate(45deg);
+            animation: doodleAnimation2 4s infinite alternate;
+        }
+        @keyframes doodleAnimation2 {
+            0% {
+                transform: rotate(45deg);
+            }
+            100% {
+                transform: rotate(40deg);
+            }
+        }
+        .doodle.dot {
+            width: 15px;
+            height: 15px;
+            background-color: #5733FF;
+            border-radius: 50%;
+        }
+        .doodle.zigzag {
+            width: 100px;
+            height: 10px;
+            background: linear-gradient(45deg, #FF5733 25%, transparent 25%, transparent 50%, #FF5733 50%, #FF5733 75%, transparent 75%, transparent);
+            background-size: 20px 20px;
+            animation: doodleAnimationZigzag 6s infinite alternate;
+        }
+        @keyframes doodleAnimationZigzag {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(5deg);
+            }
+        }
+        .doodle.squiggle {
+            width: 60px;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 5"><path d="M0 5 Q5 0 10 5" stroke="#5733FF" fill="none"/></svg>');
+            background-repeat: repeat-x;
+            animation: doodleAnimationSquiggle 7s infinite alternate;
+        }
+        @keyframes doodleAnimationSquiggle {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* ------------- Process----------------------*/
+        #processingMessage {
+            position: absolute;
+            bottom: 3vw;
+            left: 20vw;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 1vw;
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            z-index: 10;
+        }
+        .loader {
+            border: 0.3vw solid #f3f3f3;
+            border-top: 0.3vw solid #3498db; 
+            border-radius: 50%;
+            width: 2vw;
+            height: 2vw;
+            animation: spin 2s linear infinite;
+            margin: 1vw auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+    
 </head>
 <body>
-    <h3>Upload an Image:</h3>
-    <form action="/upload/" enctype="multipart/form-data" method="post">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
-    </form>
+    <h1 class="title">Animated Tale</h1>
+    <div id="processingMessage" style="display: none; text-align: center;">
+        <div class="loader"></div>
+        Processing...
+    </div>
+    <div class="canvas-container">
+        <div class="canvas">
+            <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
+            <img id="processedGIF" src="" alt="Processed GIF" style="display: none;">
+        </div>
+        
+        <form action="/process_upload" enctype="multipart/form-data" method="post">
+            <div class="upload-btn-wrapper">
+                <button class="btn-common btn-upload">Upload</button>
+                <input type="file" name="file" />
+            </div>
+            <input type="submit" class="btn-common btn-submit" value="Submit">
+        </form>
+    </div>
+
+    <svg class="balloon" style="left: 5%; width: 60px; animation-delay: 1s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
+    <svg class="balloon" style="right: 10%; width: 80px; animation-delay: 3s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
+    <svg class="balloon" style="left: 15%; width: 50px; animation-delay: 2s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
+    <svg class="balloon" style="right: 15%; width: 50px; animation-delay: 4s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
+    <svg class="balloon" style="left: 10%; width: 80px; animation-delay: 5s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
+    <svg class="balloon" style="right: 5%; width: 60px; animation-delay: 6s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
+    
+    <div class="doodle circle" style="top: 5%; left: 10%;"></div>
+    <div class="doodle line" style="top: 43%; left: 5%;"></div>
+    <div class="doodle circle" style="top: 65%; left: 14%;"></div>
+    <div class="doodle dot" style="top: 20%; left: 20%;"></div>
+    <div class="doodle zigzag" style="top: 30%; left: 5%;"></div>
+    <div class="doodle squiggle" style="top: 15%; left: 15%;"></div>
+    <div class="doodle circle" style="top: 20%; right: 15%;"></div>
+    <div class="doodle line" style="top: 45%; right: 5%;"></div>
+    <div class="doodle dot" style="top: 8%; right: 5%;"></div>
+    <div class="doodle zigzag" style="top: 70%; right: 10%;"></div>
+    <div class="doodle zigzag" style="top: 6%; right: 27%;"></div>
+    <div class="doodle squiggle" style="top: 65%; right: 20%;"></div>
+    
+    <script>
+        const imgElement = document.getElementById('uploadedImage');
+        const gifElement = document.getElementById('processedGIF');
+
+        document.querySelector('input[type="file"]').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imgElement.src = e.target.result;
+                    imgElement.style.display = "block"; // Show the uploaded image
+                    gifElement.style.display = "none"; // Hide the GIF
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        {% if video %}
+            const uploadedImage = document.getElementById('uploadedImage');
+            const processedGIF = document.getElementById('processedGIF');
+
+            uploadedImage.style.display = "none"; // Hide the uploaded image
+            processedGIF.src = "/get_video/web_test/{{ video }}"; // Set the src for the GIF
+            processedGIF.style.display = "block"; // Display the GIF
+        {% endif %}
+
+        document.querySelector('input[type="submit"]').addEventListener('click', function() {
+            document.getElementById('processingMessage').style.display = "block";
+        });
+
+        {% if video %}
+            document.getElementById('processingMessage').style.display = "none";
+        {% endif %}
+    </script>
 </body>
+
 </html>
+
+
+
