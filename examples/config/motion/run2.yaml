@@ -1,0 +1,11 @@
+filepath: examples/bvh/run2.bvh
+start_frame_idx: 0
+end_frame_idx: 271
+groundplane_joint: LeftAnkle
+forward_perp_joint_vectors:
+  - - LeftShoulder
+    - RightShoulder
+  - - LeftHip
+    - RightHip
+scale: 0.005
+up: +y

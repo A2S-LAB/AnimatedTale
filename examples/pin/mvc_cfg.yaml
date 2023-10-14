@@ -1,10 +1,12 @@
-controller:
-  MODE: video_render
-  OUTPUT_VIDEO_PATH: /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/pin/video.gif
 scene:
   ANIMATED_CHARACTERS:
-  - character_cfg: /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/pin/char_cfg.yaml
-    motion_cfg: /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/config/motion/jumping_jacks.yaml
-    retarget_cfg: /home/dcvlab/dcv/Coco/AnimatedDrawings/examples/config/retarget/cmu1_pfp.yaml
+    - character_cfg: examples/glin/char_cfg.yaml
+      motion_cfg: examples/config/motion/jelly.yaml
+      retarget_cfg: /home/dcvlab/dcv/Coco/AnimatedTale/examples/config/retarget/cum1_duo1.yaml
+    - character_cfg: examples/dorosi/char_cfg.yaml
+      motion_cfg: examples/config/motion/hurray.yaml
+      retarget_cfg: /home/dcvlab/dcv/Coco/AnimatedTale/examples/config/retarget/cum1_duo2.yaml
 view:
-  USE_MESA: true
+  CAMERA_POS: [0.1, 1.3, 2.7]
+  WINDOW_DIMENSIONS: [800, 600]
+  BACKGROUND_IMAGE: examples/drawings/back_forest.png

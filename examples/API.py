@@ -1,12 +1,18 @@
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
-from image_to_annotations import image_to_annotations
-from image_to_animation import ani_main
 from fastapi import FastAPI, UploadFile, File, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi import HTTPException
+from fastapi import Body
+
+from pydantic import BaseModel
 import shutil
 from pathlib import Path
 import logging
-from fastapi.staticfiles import StaticFiles
+
+from image_to_annotations import image_to_annotations
+from image_to_animation import ani_main
+from chatGPTAPI import createStory
 
 logging.basicConfig(level=logging.INFO)
 
@@ -35,6 +41,23 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         return {"error": str(e)}
+
+@app.get("/story")
+async def story_page(request: Request):
+    return templates.TemplateResponse("story.html", {"request": request})
+
+
+class StoryRequest(BaseModel):
+    prompt: str
+
+@app.post("/create_story")
+async def create_story_endpoint(request: StoryRequest):
+    try:
+        story = createStory(request.prompt)
+        return {"story": story}
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="Story creation failed.")
 
 @app.get("/get_image/{image_path:path}")
 def get_image(image_path: str):

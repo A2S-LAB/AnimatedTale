@@ -31,12 +31,14 @@
             align-items: center;
             background-color: rgba(255, 255, 255, 0.5);
             flex-direction: column;
-            margin-bottom: 5vh; /* Adjusted margin for visual balance */
+            margin-bottom: 5vh; 
+            width: 100%;
+            padding: 2vh 0;
         }
 
         form {
             position: absolute;
-            bottom: 2vh; /* Adjusted for better spacing from the bottom */
+            bottom: 1vh; /* Adjusted for better spacing from the bottom */
             right: 1vw;
             background-color: transparent;
             border: none;
@@ -55,7 +57,6 @@
             box-shadow: 0 0.4vw 0.8vw rgba(0, 0, 0, 0.1);
             padding: 2vh;
             text-align: center;
-            margin-top: 1.5vh;
             border-radius: 1.5vw;
         }
     
@@ -70,7 +71,7 @@
         /*----------------------------------------*/
         form {
             position: absolute;
-            bottom: 1vh;
+            bottom: 3vh;
             right: 20vw;
             background-color: transparent;
             border: none;
@@ -98,10 +99,13 @@
         }
         .btn-upload {
             background-color: #333;
-            color: #FFF;
+            border-color: #333;
+            color: white;
+            box-shadow: 0 0.3vw 0.6vw rgba(0, 0, 0, 0.1);
+            width: auto;
         }
         .btn-upload:hover {
-            background-color: #555;
+            background-color: #969696;
         }
         .btn-submit {
             background-color: #87CEFA;
@@ -109,6 +113,9 @@
             color: white;
             box-shadow: 0 0.3vw 0.6vw rgba(0, 0, 0, 0.1);
             width: auto;
+        }
+        .btn-submit:hover {
+            background-color: #B0E0E6;
         }
         .upload-btn-wrapper {
             position: relative;
@@ -130,19 +137,25 @@
             z-index: 2;
             opacity: 0;  
         }
-        .btn-upload {
-            background-color: #333;
-            color: #FFF;
+
+
+        .btn-prev {
+            position: absolute;
+            left: 12.3vw;
+            bottom: 1vw;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif;
+            font-size: 1vw;
+            text-decoration: none;
+            padding: 1vh 2vw;
             border: 0.08vw solid #ccc;
             border-radius: 0.4vw;
-            padding: 1.1vh 1.5vw;
-            font-size: 1.1vw;
             cursor: pointer;
+            background-color: #87CEFA;
+            color: white;
             transition: background-color 0.3s;
         }
-
-        .btn-upload:hover {
-            background-color: #555;
+        .btn-prev:hover {
+            background-color: #B0E0E6;
         }
 
 
@@ -268,7 +281,7 @@
             <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
             <img id="processedGIF" src="" alt="Processed GIF" style="display: none;">
         </div>
-        
+        <a href="/story" class="btn-prev">Prev</a>
         <form action="/process_upload" enctype="multipart/form-data" method="post">
             <div class="upload-btn-wrapper">
                 <button class="btn-common btn-upload">Upload</button>
