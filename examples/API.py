@@ -17,7 +17,9 @@ from chatGPTAPI import createStory
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
+app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 # uvicorn API:app --reload
+# lsof -i:8000
 # http://127.0.0.1:8001/process_image?img_fn=dorosi/image.png&out_dir=dorosi
 
 templates = Jinja2Templates(directory="templates")
@@ -45,7 +47,6 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
 @app.get("/story")
 async def story_page(request: Request):
     return templates.TemplateResponse("story.html", {"request": request})
-
 
 class StoryRequest(BaseModel):
     prompt: str

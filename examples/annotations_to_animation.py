@@ -17,7 +17,7 @@ def annotations_to_animation(char_anno_dir: str, motion_cfg_fn: str, retarget_cf
     Given a path to a directory with character annotations, a motion configuration file, and a retarget configuration file,
     creates an animation and saves it to {annotation_dir}/video.png
     """
-
+    print(str(Path(motion_cfg_fn)))
     # package character_cfg_fn, motion_cfg_fn, and retarget_cfg_fn
     animated_drawing_dict = {
         'character_cfg': str(Path(char_anno_dir, 'char_cfg.yaml').resolve()),

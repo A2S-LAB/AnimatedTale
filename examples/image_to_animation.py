@@ -43,6 +43,6 @@ if __name__ == '__main__':
 def ani_main(_img_fn: str, _char_anno_dir: str):
     img_fn = _img_fn
     char_anno_dir = _char_anno_dir
-    motion_cfg_fn = resource_filename(__name__, 'config/motion/wave_hello.yaml')
-    retarget_cfg_fn = resource_filename(__name__, 'config/retarget/fair1_ppf.yaml')
+    motion_cfg_fn = resource_filename(__name__, 'config/motion/hi.yaml')
+    retarget_cfg_fn = resource_filename(__name__, 'config/retarget/cmu1_pfp_copy.yaml')
     image_to_animation(img_fn, char_anno_dir, motion_cfg_fn, retarget_cfg_fn)
