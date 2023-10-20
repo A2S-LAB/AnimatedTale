@@ -13,6 +13,7 @@ import logging
 from image_to_annotations import image_to_annotations
 from image_to_animation import ani_main
 from chatGPTAPI import createStory
+from diffusion import makeBackground
 
 logging.basicConfig(level=logging.INFO)
 
