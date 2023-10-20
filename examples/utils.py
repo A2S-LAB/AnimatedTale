@@ -1,26 +1,6 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 
-
-def show_points(coords, labels, ax, marker_size=375):
-    pos_points = coords[labels==1]
-    neg_points = coords[labels==0]
-    ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='black', linewidth=1.25)
-    ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='black', linewidth=1.25)   
-    
-    
-def show_box(box, ax, lw=2):
-    x0, y0 = box[0], box[1]
-    w, h = box[2] - box[0], box[3] - box[1]
-    ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor='green', facecolor=(0,0,0,0), lw=lw))    
-
-    
-def show_mask(mask, ax):
-    h, w = mask.shape[-2:]
-    mask_image = mask.reshape(h, w, 1)
-    ax.imshow(mask_image, cmap='gray')
-    
 
 def auto_bbox(image, th=160):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -60,3 +40,130 @@ def auto_bbox(image, th=160):
     
     bbox = np.array([x1, y1, x2, y2])
     return bbox
+
+
+def crop(path):
+    radius = 15
+    color = (0, 0, 255)
+    points = []
+
+    image = cv2.imread(path + '/image.png')
+
+    bbox = auto_bbox(image)
+    points.append([bbox[0], bbox[1]])
+    points.append([bbox[2], bbox[1]])
+    points.append([bbox[0], bbox[3]])
+    points.append([bbox[2], bbox[3]])
+
+    dragging_point_index = None 
+
+    def handle_mouse_events(event, x, y, flags, param):
+        global dragging_point_index 
+
+        if event == cv2.EVENT_LBUTTONDOWN:
+            for i in range(len(points)):
+                px, py = points[i]
+                if abs(x - px) < radius and abs(y - py) < radius: 
+                    dragging_point_index = i 
+
+        elif event == cv2.EVENT_MOUSEMOVE:
+            if dragging_point_index == 0:
+                points[dragging_point_index] = [x, y]
+                points[2][0] = x
+                points[1][1] = y
+            elif dragging_point_index == 1:
+                points[dragging_point_index] = [x, y]
+                points[3][0] = x
+                points[0][1] = y
+            elif dragging_point_index == 2:
+                points[dragging_point_index] = [x, y]
+                points[0][0] = x
+                points[3][1] = y
+            elif dragging_point_index == 3:
+                points[dragging_point_index] = [x, y]
+                points[1][0] = x
+                points[2][1] = y
+
+        elif event == cv2.EVENT_LBUTTONUP:
+            dragging_point_index= None
+
+    cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+    cv2.setMouseCallback('image', handle_mouse_events)
+
+    while True:
+        image_copy = image.copy()
+        cv2.rectangle(image_copy, (points[0][0], points[0][1], points[3][0] - points[0][0], points[3][1] - points[0][1]), color, 4)
+        for point in points:
+            cv2.circle(image_copy, point, radius, color, -1, cv2.LINE_AA)
+
+        cv2.imshow('image', image_copy)
+
+        if cv2.waitKey(1) & 0xFF == 27:
+            break 
+
+    cv2.destroyAllWindows()
+
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = image[points[0][1]:points[3][1], points[0][0]:points[3][0]]
+
+    cv2.imwrite(path + '/texture.png', image)
+    
+    
+def mask(path):
+    
+    oldx = oldy = 0
+    color = [0, 255]
+    thickness = 4
+    
+    src = cv2.imread(path + '/image.png')
+    mask = cv2.imread(path + '/mask.png')
+    mask_copy = mask.copy()
+    
+    def on_mouse(event, x, y, flags, param):
+
+        global thickness, oldx, oldy
+
+        if event == cv2.EVENT_LBUTTONDOWN:
+            oldx, oldy = x, y
+
+        elif event == cv2.EVENT_MOUSEWHEEL:
+            if flags > 0:
+                thickness += 1
+            elif thickness > 1:
+                thickness -= 1
+
+        elif event == cv2.EVENT_MOUSEMOVE:
+            if flags & cv2.EVENT_FLAG_LBUTTON:
+                cv2.line(mask_copy, (oldx, oldy), (x, y), (color[0], color[0], color[0]), thickness, cv2.LINE_AA)
+                oldx, oldy = x, y
+                
+    cv2.namedWindow('mask', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('masked_image', cv2.WINDOW_NORMAL)
+    
+    cv2.setMouseCallback('mask', on_mouse)
+    
+    print()
+    print("Press 'c' to change color")
+    print("Press 'r' to reset mask")
+    print("Turn the mouse wheel up to increase thickness")
+    print("Turn the mouse wheel down to decrease thickness")
+    print("Press 'esc' to finish")
+    
+    while True:
+        dst = cv2.bitwise_and(src, mask_copy)
+        cv2.imshow('mask', mask_copy)
+        cv2.imshow('masked_image', dst)
+
+        key = cv2.waitKey(1) & 0xFF
+
+        if key == 27:
+            break
+
+        elif key == ord('c'):
+            color = color[::-1]
+            
+        elif key == ord('r'):
+            mask_copy = mask.copy()
+            
+    cv2.destroyAllWindows()
+    cv2.imwrite(path + '/mask.png', mask_copy)

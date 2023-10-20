@@ -8,7 +8,7 @@ from pathlib import Path
 import logging
 import sys
 from pkg_resources import resource_filename
-
+from utils import crop, mask
 
 def image_to_animation(img_fn: str, char_anno_dir: str, motion_cfg_fn: str, retarget_cfg_fn: str):
     """
@@ -17,6 +17,16 @@ def image_to_animation(img_fn: str, char_anno_dir: str, motion_cfg_fn: str, reta
     """
     # create the annotations
     image_to_annotations(img_fn, char_anno_dir)
+    
+    crop(char_anno_dir)
+    mask(char_anno_dir)
+    
+    """
+    여기에 사진 수정하는 함수 넣어주면 될 듯 해요
+    crop(char_anno_dir)
+    mask(char_anno_dir)
+    joint(char_anno_dir)
+    """
 
     # create the animation
     annotations_to_animation(char_anno_dir, motion_cfg_fn, retarget_cfg_fn)
