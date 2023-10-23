@@ -5,6 +5,6 @@ scene:
       retarget_cfg: examples/config/retarget/mixamo_fff.yaml
 controller:
   MODE: video_render
-  OUTPUT_VIDEO_PATH: ./runningjump.gif
+  OUTPUT_VIDEO_PATH: ./runningjump_r.gif
 view:
   USE_MESA: True

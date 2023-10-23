@@ -13,6 +13,7 @@ def makeBackground(_prompt):
     base = DiffusionPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16, variant="fp16", use_safetensors=True
     )
+    
     base.to("cuda")
     refiner = DiffusionPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-refiner-1.0",
@@ -51,5 +52,6 @@ def makeBackground(_prompt):
         image.save(filename)
 
 if __name__ == '__main__':
-    prompt = "in style of children drawing, a castle from the Wizard of OZ, drawn with crayons, colorful"
+    prompt = "a cute fennec fox, as if a kid drew, simple, in stlye of croquis"
+    print(torch.cuda.is_available())
     makeBackground(prompt)

@@ -1,6 +1,6 @@
-filepath: examples/bvh/runningjump.bvh
+filepath: examples/bvh/running_1.bvh
 start_frame_idx: 0
-end_frame_idx: 108
+end_frame_idx: 110
 groundplane_joint: LeftFoot
 forward_perp_joint_vectors:
   - - LeftShoulder
