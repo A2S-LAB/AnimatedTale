@@ -3,7 +3,9 @@ from fastapi.responses import FileResponse, RedirectResponse
 from fastapi import FastAPI, UploadFile, File, Request, WebSocket, Depends, status
 from fastapi.staticfiles import StaticFiles
 from fastapi import HTTPException
+from starlette.responses import JSONResponse
 import os
+import cv2
 
 from pydantic import BaseModel
 import shutil
@@ -15,6 +17,7 @@ from annotations_to_animation import annotations_to_animation
 from image_to_animation import ani_main
 from chatGPTAPI import createStory
 from diffusion import makeBackground
+from utils import auto_bbox
 
 # uvicorn API_0:app --reload
 # lsof -i:8000
@@ -110,3 +113,23 @@ def get_gif_list():
 @app.get("/exhibit")
 async def exhibit_page(request: Request):
     return templates.TemplateResponse("exhibit.html", {"request": request})
+
+@app.post("/bbox")
+async def bbox():
+    image = cv2.imread("web_test/image.png")
+    bbox = auto_bbox(image)
+    return {"bbox": bbox.tolist()}
+
+@app.post("/crop_image")
+async def crop_image(request: Request):
+    try:
+        data = await request.json()
+        x, y, width, height = int(data["x"]), int(data["y"]), int(data["width"]), int(data["height"])
+        print(x, y, width, height)
+        image = cv2.imread("web_test/image.png")
+        cropped_image = image[y:y+height, x:x+width]
+        cv2.imwrite("web_test/texture.png", cropped_image)
+        
+        return {"success": True}
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "detail": str(e)}, status_code=400)

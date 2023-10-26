@@ -213,6 +213,14 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+        #textureCanvas {
+            border: 2px solid hsl(0, 0%, 43%);
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
     </style>
     
@@ -221,11 +229,12 @@
     <h1 class="title">Animated Tale</h1>
     <div class="canvas-container">
         <div class="canvas">
-            <img id="Texture" src="/get_image/web_test/texture.png" alt="Texture">
+            <canvas id="textureCanvas" width="400" height="600"></canvas>
         </div>
         <a href="/upload" class="btn-prev">Prev</a>
         <a href="/mask" class="btn-next">Next</a>
     </div>
+    
 
     <svg class="balloon" style="left: 5%; width: 60px; animation-delay: 1s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
     <svg class="balloon" style="right: 10%; width: 80px; animation-delay: 3s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
@@ -248,6 +257,210 @@
     <div class="doodle squiggle" style="top: 65%; right: 20%;"></div>
 
     <script>
+        const handleSize = 25;  // <-- Moved this up here
+        window.onload = function() {
+            const canvas = document.getElementById('textureCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            img.src = '/get_image/web_test/image.png';
+                    
+            let isDragging = false;
+            let startX, startY, rectWidth, rectHeight;
+            let rect = {x: 50, y: 50, width: 200, height: 150}; 
+
+            img.onload = function() {
+                let scale = (0.9 * window.innerHeight) / img.height;
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                ctx.drawImage(img, 0, 0);
+
+                fetch("/bbox", {
+                    method: "POST"
+                })
+                .then(response => response.json())
+                .then(data => {
+                    rect = {
+                        x: data.bbox[0],
+                        y: data.bbox[1],
+                        width: data.bbox[2] - data.bbox[0],
+                        height: data.bbox[3] - data.bbox[1]
+                    };
+                    
+                    drawRect();
+                })
+                .catch(error => {
+                    console.error("Error fetching bbox:", error);
+                });
+            };
+
+            function drawRect() {
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 5;
+                ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+
+                // Draw small rectangles (handles) at each corner and each edge of the bounding box
+                ctx.fillStyle = 'red';
+
+                // Define a function to draw a handle given its top-left corner
+                function drawHandle(x, y) {
+                    ctx.fillRect(x - handleSize/2, y - handleSize/2, handleSize, handleSize);
+                }
+
+                // Corners
+                drawHandle(rect.x, rect.y);  // Top-left
+                drawHandle(rect.x + rect.width, rect.y);  // Top-right
+                drawHandle(rect.x, rect.y + rect.height);  // Bottom-left
+                drawHandle(rect.x + rect.width, rect.y + rect.height);  // Bottom-right
+
+                // Edges
+                drawHandle(rect.x + rect.width/2, rect.y);  // Top
+                drawHandle(rect.x + rect.width/2, rect.y + rect.height);  // Bottom
+                drawHandle(rect.x, rect.y + rect.height/2);  // Left
+                drawHandle(rect.x + rect.width, rect.y + rect.height/2);  // Right
+            }
+
+
+            function getMousePos(canvas, evt) {
+                var rect = canvas.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
+                };
+            }
+
+            let resizeDirection = '';  
+
+            canvas.addEventListener('mousedown', function(e) {
+                const mousePos = getMousePos(canvas, e);
+                
+                if (Math.abs(mousePos.x - rect.x) < handleSize && Math.abs(mousePos.y - rect.y) < handleSize) {
+                    isDragging = true;
+                    resizeDirection = 'top-left';
+                } else if (Math.abs(mousePos.x - (rect.x + rect.width)) < handleSize && Math.abs(mousePos.y - rect.y) < handleSize) {
+                    isDragging = true;
+                    resizeDirection = 'top-right';
+                } else if (Math.abs(mousePos.x - rect.x) < handleSize && Math.abs(mousePos.y - (rect.y + rect.height)) < handleSize) {
+                    isDragging = true;
+                    resizeDirection = 'bottom-left';
+                } else if (Math.abs(mousePos.x - (rect.x + rect.width)) < handleSize && Math.abs(mousePos.y - (rect.y + rect.height)) < handleSize) {
+                    isDragging = true;
+                    resizeDirection = 'bottom-right';
+                } else if (Math.abs(mousePos.x - (rect.x + rect.width/2)) < handleSize && Math.abs(mousePos.y - rect.y) < handleSize) {
+                    isDragging = true;
+                    resizeDirection = 'top';
+                } else if (Math.abs(mousePos.x - (rect.x + rect.width/2)) < handleSize && Math.abs(mousePos.y - (rect.y + rect.height)) < handleSize) {
+                    isDragging = true;
+                    resizeDirection = 'bottom';
+                } else if (Math.abs(mousePos.x - rect.x) < handleSize && Math.abs(mousePos.y - (rect.y + rect.height/2)) < handleSize) {
+                    isDragging = true;
+                    resizeDirection = 'left';
+                } else if (Math.abs(mousePos.x - (rect.x + rect.width)) < handleSize && Math.abs(mousePos.y - (rect.y + rect.height/2)) < handleSize) {
+                    isDragging = true;
+                    resizeDirection = 'right';
+                } else if (mousePos.x > rect.x && mousePos.x < rect.x + rect.width && mousePos.y > rect.y && mousePos.y < rect.y + rect.height) {
+                    isDragging = true;
+                    startX = mousePos.x - rect.x;
+                    startY = mousePos.y - rect.y;
+                    resizeDirection = 'move';
+                }
+            });
+
+            canvas.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    const mousePos = getMousePos(canvas, e);
+                                
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                                
+                    switch (resizeDirection) {
+                        case 'top-left':
+                            rect.width += rect.x - mousePos.x;
+                            rect.height += rect.y - mousePos.y;
+                            rect.x = mousePos.x;
+                            rect.y = mousePos.y;
+                            break;
+                        case 'top-right':
+                            rect.width = mousePos.x - rect.x;
+                            rect.height += rect.y - mousePos.y;
+                            rect.y = mousePos.y;
+                            break;
+                        case 'bottom-left':
+                            rect.width += rect.x - mousePos.x;
+                            rect.height = mousePos.y - rect.y;
+                            rect.x = mousePos.x;
+                            break;
+                        case 'bottom-right':
+                            rect.width = mousePos.x - rect.x;
+                            rect.height = mousePos.y - rect.y;
+                            break;
+                        case 'top':
+                            rect.height += rect.y - mousePos.y;
+                            rect.y = mousePos.y;
+                            break;
+                        case 'bottom':
+                            rect.height = mousePos.y - rect.y;
+                            break;
+                        case 'left':
+                            rect.width += rect.x - mousePos.x;
+                            rect.x = mousePos.x;
+                            break;
+                        case 'right':
+                            rect.width = mousePos.x - rect.x;
+                            break;
+                        case 'move':
+                            rect.x = mousePos.x - startX;
+                            rect.y = mousePos.y - startY;
+                            break;
+                    }
+                                
+                    drawRect();
+                }
+            });
+
+            canvas.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+
+            document.querySelector('.btn-next').addEventListener('click', function(event) {
+                event.preventDefault();  // Prevent the default behavior of the link
+
+                // Get the bounding box data
+                const data = {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.width,
+                    height: rect.height
+                };
+
+                // Send the bounding box data to the server
+                fetch("/crop_image", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Navigate to the next page
+                        window.location.href = '/mask';
+                    } else {
+                        console.error("Failed to crop the image.");
+                    }
+                })
+                .catch(error => {
+                    console.error("There was a problem with the fetch operation:", error.message);
+                });
+            });
+        }
 
     </script>
     
