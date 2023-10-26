@@ -13,11 +13,6 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
         }
     
         .title {
@@ -271,20 +266,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .submitted-popup {
-            display: none; /* Initially hidden */
-            position: fixed;
-            bottom: 10%; /* Position it 10% from the bottom of the page */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(128, 128, 128, 0.5); /* Transparent gray background */
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            width: auto; /* Adjust width as needed */
-        }
 
     </style>
     
@@ -298,7 +279,7 @@
     <div class="canvas-container">
         <div class="canvas">
             <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
-
+            <img id="processedGIF" src="" alt="Processed GIF" style="display: none;">
         </div>
         <a href="/story" class="btn-prev">Prev</a>
         <form action="/process_upload" enctype="multipart/form-data" method="post">
@@ -309,10 +290,6 @@
             <input type="submit" class="btn-common btn-submit" value="Submit">
         </form>
     </div>
-    <div id="submittedMessage" class="submitted-popup">
-        Submitted
-    </div>
-    
 
     <svg class="balloon" style="left: 5%; width: 60px; animation-delay: 1s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
     <svg class="balloon" style="right: 10%; width: 80px; animation-delay: 3s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
@@ -336,6 +313,8 @@
     
     <script>
         const imgElement = document.getElementById('uploadedImage');
+        const gifElement = document.getElementById('processedGIF');
+
         document.querySelector('input[type="file"]').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
@@ -343,27 +322,28 @@
                 reader.onload = function (e) {
                     imgElement.src = e.target.result;
                     imgElement.style.display = "block"; // Show the uploaded image
+                    gifElement.style.display = "none"; // Hide the GIF
                 }
                 reader.readAsDataURL(file);
             }
         });
 
+        {% if video %}
+            const uploadedImage = document.getElementById('uploadedImage');
+            const processedGIF = document.getElementById('processedGIF');
+
+            uploadedImage.style.display = "none"; // Hide the uploaded image
+            processedGIF.src = "/get_video/web_test/{{ video }}"; // Set the src for the GIF
+            processedGIF.style.display = "block"; // Display the GIF
+        {% endif %}
+
         document.querySelector('input[type="submit"]').addEventListener('click', function() {
             document.getElementById('processingMessage').style.display = "block";
         });
 
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('from_confirm')) {
-                let message = document.getElementById('submittedMessage');
-                message.style.display = "block";
-                
-                setTimeout(function() {
-                    message.style.display = "none";
-                }, 2000);
-            }
-        }
-
+        {% if video %}
+            document.getElementById('processingMessage').style.display = "none";
+        {% endif %}
     </script>
 </body>
 

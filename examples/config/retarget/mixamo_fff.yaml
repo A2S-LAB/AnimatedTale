@@ -9,7 +9,7 @@ bvh_projection_bodypart_groups:
   - RightForeArm
   - RightHand
   - RightHandIndex1
-  method: pca
+  method: frontal
   name: Upper Limbs
 - bvh_joint_names:
   - LeftUpLeg
@@ -20,7 +20,7 @@ bvh_projection_bodypart_groups:
   - RightLeg
   - RightFoot
   - RightToeBase
-  method: pca
+  method: frontal
   name: Lower Limbs
 - bvh_joint_names:
   - Hips

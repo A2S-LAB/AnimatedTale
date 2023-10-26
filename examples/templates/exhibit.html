@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/get_image/web_contents/AT_Logo.ico" type="image/x-icon">
+    <title>Animated Tale</title>
+    <style>
+        body {
+            background-image: url('get_video/web_contents/background.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .gif-container {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            margin: 10px;
+            overflow: hidden;
+        }
+        .gif-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <!-- The gifs will be displayed here -->
+
+<script>
+    // Create a WebSocket connection
+    const socket = new WebSocket("ws://127.0.0.1:8000/ws");
+
+    // Fetch the list of gifs from the server when the WebSocket receives a new_gif message
+    socket.onmessage = function(event) {
+        if (event.data === "new_gif") {
+            fetchLatestGif();
+        }
+    };
+
+    // Fetch only the latest gif and add it to the page
+    async function fetchLatestGif() {
+        try {
+            const response = await fetch('/get_gif_list');
+            const data = await response.json();
+            const latestGif = data.gifs[data.gifs.length - 1];
+            displayGif(latestGif);
+        } catch (error) {
+            console.error('Error fetching latest gif:', error);
+        }
+    }
+
+    // Fetch the list of gifs from the server
+    async function fetchGifs() {
+        try {
+            const response = await fetch('/get_gif_list');
+            const data = await response.json();
+            // Clear existing gifs
+            document.body.innerHTML = '';
+            displayGifs(data.gifs);
+        } catch (error) {
+            console.error('Error fetching gifs:', error);
+        }
+    }
+
+    // Display the gifs on the page
+    function displayGifs(gifList) {
+        const maxGifs = 10;
+        const container = document.body;
+        for (let i = 0; i < Math.min(gifList.length, maxGifs); i++) {
+            const gifElement = document.createElement('div');
+            gifElement.classList.add('gif-container');
+            const img = document.createElement('img');
+            img.src = 'get_video/web_contents/exhibit/' + gifList[i];
+            gifElement.appendChild(img);
+            container.appendChild(gifElement);
+            initializeGifMovement(gifElement);  // Call the function for each gif element
+        }
+    }
+
+    function initializeGifMovement(gifElement) {
+        // Set initial random position
+        const maxX = window.innerWidth - 300;  // 300px is the width of the gif container
+        const maxY = window.innerHeight - 300; // 300px is the height of the gif container
+        const randomX = Math.floor(Math.random() * maxX);
+        const randomY = Math.floor(Math.random() * maxY);  // Random y position
+        gifElement.style.left = randomX + 'px';
+        gifElement.style.top = randomY + 'px';  // Set y position
+
+        // Movement parameters (only horizontal movement)
+        let speedX = (Math.random() + 0.5) * 2;  // Random speed between 0.5 to 1.5 multiplied by 2
+        let directionX = Math.random() < 0.5 ? -1 : 1;  // Random initial direction
+
+        // Start moving the gif
+        setInterval(() => {
+            let newX = parseInt(gifElement.style.left) + speedX * directionX;
+
+            // Bounce on reaching the edge
+            if (newX <= 0 || newX >= maxX) {
+                directionX = -directionX;
+                
+                // Flip the gif horizontally using CSS transform
+                if (directionX === 1) {
+                    gifElement.firstChild.style.transform = "scaleX(1)";  // Original orientation
+                } else {
+                    gifElement.firstChild.style.transform = "scaleX(-1)";  // Flipped orientation
+                }
+            }
+
+            gifElement.style.left = newX + 'px';
+        }, 20);  // Update every 20ms for smoother movement
+    }
+
+    // Call the fetchGifs function when the page loads
+    window.onload = fetchGifs;
+
+</script>
+
+</body>
+</html>

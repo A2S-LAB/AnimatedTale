@@ -13,11 +13,6 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
         }
     
         .title {
@@ -102,16 +97,6 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        .btn-upload {
-            background-color: #333;
-            border-color: #333;
-            color: white;
-            box-shadow: 0 0.3vw 0.6vw rgba(0, 0, 0, 0.1);
-            width: auto;
-        }
-        .btn-upload:hover {
-            background-color: #969696;
-        }
         .btn-submit {
             background-color: #87CEFA;
             border-color: #87CEFA;
@@ -122,27 +107,6 @@
         .btn-submit:hover {
             background-color: #B0E0E6;
         }
-        .upload-btn-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-        .upload-btn-wrapper .btn-common {
-            position: relative;
-            z-index: 1;
-        }
-        .upload-btn-wrapper input[type=file] {
-            font-size: 1.1vw;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;  /* Ensure it covers the entire button */
-            height: 100%; /* Ensure it covers the entire button */
-            cursor: pointer; /* Make sure the cursor is a pointer over the invisible input */
-            z-index: 2;
-            opacity: 0;  
-        }
-
 
         .btn-prev {
             position: absolute;
@@ -162,7 +126,6 @@
         .btn-prev:hover {
             background-color: #B0E0E6;
         }
-
 
         /* ------------- decos----------------------*/
         .balloon {
@@ -271,19 +234,14 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .submitted-popup {
-            display: none; /* Initially hidden */
-            position: fixed;
-            bottom: 10%; /* Position it 10% from the bottom of the page */
+        #mainGif {
+            max-height: 100%;
+            display: block;
+            margin: auto;
+            position: absolute;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(128, 128, 128, 0.5); /* Transparent gray background */
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            width: auto; /* Adjust width as needed */
+            transform: translate(-50%, -50%);
         }
 
     </style>
@@ -297,22 +255,14 @@
     </div>
     <div class="canvas-container">
         <div class="canvas">
-            <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
-
+            <img id="mainGif" src="/get_image/web_test/video.gif" alt="Main GIF">
         </div>
-        <a href="/story" class="btn-prev">Prev</a>
-        <form action="/process_upload" enctype="multipart/form-data" method="post">
-            <div class="upload-btn-wrapper">
-                <button class="btn-common btn-upload">Upload</button>
-                <input type="file" name="file" />
-            </div>
+        <a href="/joint_overlay" class="btn-prev">Prev</a>
+        
+        <form action="/move_gif" enctype="multipart/form-data" method="post">
             <input type="submit" class="btn-common btn-submit" value="Submit">
         </form>
     </div>
-    <div id="submittedMessage" class="submitted-popup">
-        Submitted
-    </div>
-    
 
     <svg class="balloon" style="left: 5%; width: 60px; animation-delay: 1s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
     <svg class="balloon" style="right: 10%; width: 80px; animation-delay: 3s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
@@ -335,35 +285,6 @@
     <div class="doodle squiggle" style="top: 65%; right: 20%;"></div>
     
     <script>
-        const imgElement = document.getElementById('uploadedImage');
-        document.querySelector('input[type="file"]').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    imgElement.src = e.target.result;
-                    imgElement.style.display = "block"; // Show the uploaded image
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.querySelector('input[type="submit"]').addEventListener('click', function() {
-            document.getElementById('processingMessage').style.display = "block";
-        });
-
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('from_confirm')) {
-                let message = document.getElementById('submittedMessage');
-                message.style.display = "block";
-                
-                setTimeout(function() {
-                    message.style.display = "none";
-                }, 2000);
-            }
-        }
-
     </script>
 </body>
 
