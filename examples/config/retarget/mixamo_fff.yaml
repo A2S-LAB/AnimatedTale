@@ -20,7 +20,7 @@ bvh_projection_bodypart_groups:
   - RightLeg
   - RightFoot
   - RightToeBase
-  method: frontal
+  method: pca
   name: Lower Limbs
 - bvh_joint_names:
   - Hips

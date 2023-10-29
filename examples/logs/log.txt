@@ -5210,3 +5210,8 @@ INFO:root:invalid frame_idx (839), replacing with last frame 838
 INFO:root:Rendered 839 frames in 30.639447927474976 seconds.
 INFO:root:VideoWriter will write to /home/dcvlab/dcv/Coco/AnimatedTale/examples/lion/video.gif
 INFO:root:Wrote video to file in in 3.7499771118164062 seconds.
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:8080
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:8080
+DEBUG:urllib3.connectionpool:http://localhost:8080 "POST /predictions/drawn_humanoid_pose_estimator HTTP/1.1" 200 1659
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): localhost:8080
+DEBUG:urllib3.connectionpool:http://localhost:8080 "POST /predictions/drawn_humanoid_pose_estimator HTTP/1.1" 200 1665
