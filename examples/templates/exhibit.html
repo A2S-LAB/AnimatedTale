@@ -37,16 +37,6 @@
     <!-- The gifs will be displayed here -->
 
 <script>
-    // Create a WebSocket connection
-    const socket = new WebSocket("ws://127.0.0.1:8000/ws");
-
-    // Fetch the list of gifs from the server when the WebSocket receives a new_gif message
-    socket.onmessage = function(event) {
-        if (event.data === "new_gif") {
-            fetchLatestGif();
-        }
-    };
-
     // Fetch only the latest gif and add it to the page
     async function fetchLatestGif() {
         try {
@@ -80,7 +70,7 @@
             const gifElement = document.createElement('div');
             gifElement.classList.add('gif-container');
             const img = document.createElement('img');
-            img.src = 'get_video/web_contents/exhibit/' + gifList[i];
+            img.src = `/get_image/web_contents/exhibit/${gifList[i]}?v=${Date.now()}`;
             gifElement.appendChild(img);
             container.appendChild(gifElement);
             initializeGifMovement(gifElement);  // Call the function for each gif element

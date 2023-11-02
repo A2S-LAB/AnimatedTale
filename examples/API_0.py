@@ -120,16 +120,24 @@ async def bbox():
     bbox = auto_bbox(image)
     return {"bbox": bbox.tolist()}
 
+
+    
 @app.post("/crop_image")
 async def crop_image(request: Request):
     try:
         data = await request.json()
-        x, y, width, height = int(data["x"]), int(data["y"]), int(data["width"]), int(data["height"])
-        print(x, y, width, height)
+        scale = float(data["scale"])
+        x, y, width, height = int(data["x"] / scale), int(data["y"] / scale), int(data["width"] / scale), int(data["height"] / scale)
         image = cv2.imread("web_test/image.png")
-        cropped_image = image[y:y+height, x:x+width]
-        cv2.imwrite("web_test/texture.png", cropped_image)
+        texture_img = cv2.imread("web_test/texture.png")
+        image = image[y:y+height, x:x+width]
+        image = cv2.resize(image, (texture_img.shape[1], texture_img.shape[0]), interpolation=cv2.INTER_LINEAR)
+        # cv2.imwrite("web_test/texture.png", image)
         
         return {"success": True}
     except Exception as e:
         return JSONResponse(content={"status": "error", "detail": str(e)}, status_code=400)
+    
+@app.get("/motion")
+async def motion(request: Request):
+    return templates.TemplateResponse("motion.html", {"request": request})

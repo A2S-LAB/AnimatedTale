@@ -72,6 +72,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+        
         .btn-prev {
             position: absolute;
             left: 12.3vw;
@@ -257,7 +258,8 @@
     <div class="doodle squiggle" style="top: 65%; right: 20%;"></div>
 
     <script>
-        const handleSize = 25;  // <-- Moved this up here
+        const handleSize = 15;  // <-- Moved this up here
+        let scale;
         window.onload = function() {
             const canvas = document.getElementById('textureCanvas');
             const ctx = canvas.getContext('2d');
@@ -270,11 +272,13 @@
             let rect = {x: 50, y: 50, width: 200, height: 150}; 
 
             img.onload = function() {
-                let scale = (0.9 * window.innerHeight) / img.height;
-                canvas.width = img.width;
-                canvas.height = img.height;
+                scale = canvas.height / img.height;
+                let scaledWidth = img.width * scale;
+                let scaledHeight = img.height * scale;
+                canvas.width = scaledWidth;
+                canvas.height = scaledHeight;
 
-                ctx.drawImage(img, 0, 0);
+                ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, scaledWidth, scaledHeight);
 
                 fetch("/bbox", {
                     method: "POST"
@@ -287,6 +291,10 @@
                         width: data.bbox[2] - data.bbox[0],
                         height: data.bbox[3] - data.bbox[1]
                     };
+                    rect.x *= scale;
+                    rect.y *= scale;
+                    rect.width *= scale;
+                    rect.height *= scale;
                     
                     drawRect();
                 })
@@ -297,7 +305,7 @@
 
             function drawRect() {
                 ctx.strokeStyle = 'red';
-                ctx.lineWidth = 5;
+                ctx.lineWidth = 3;
                 ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
 
                 // Draw small rectangles (handles) at each corner and each edge of the bounding box
@@ -431,7 +439,8 @@
                     x: rect.x,
                     y: rect.y,
                     width: rect.width,
-                    height: rect.height
+                    height: rect.height,
+                    scale:scale
                 };
 
                 // Send the bounding box data to the server

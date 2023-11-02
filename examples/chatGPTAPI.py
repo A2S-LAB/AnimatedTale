@@ -1,7 +1,6 @@
 import openai
 
-# 발급받은 API 키 설정
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = ""
 
 
 openai.api_key = OPENAI_API_KEY

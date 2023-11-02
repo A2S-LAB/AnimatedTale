@@ -1,19 +1,12 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
-
 import os
 import sys
 import requests
 import cv2
 import json
 import numpy as np
-from skimage import measure
-from scipy import ndimage
 from pathlib import Path
 import yaml
 import logging
-import torch
 from segment_anything import sam_model_registry, SamPredictor
 from utils import *
 
@@ -27,15 +20,6 @@ if not os.path.exists("mask"):
     os.makedirs("mask")
 
 def image_to_annotations(img_fn: str, out_dir: str) -> None:
-    """
-    Given the RGB image located at img_fn, runs detection, segmentation, and pose estimation for drawn character within it.
-    Crops the image and saves texture, mask, and character config files necessary for animation. Writes to out_dir.
-
-    Params:
-        img_fn: path to RGB image
-        out_dir: directory where outputs will be saved
-    """
-
     # create output directory
     outdir = Path(out_dir)
     outdir.mkdir(exist_ok=True)

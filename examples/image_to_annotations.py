@@ -12,6 +12,7 @@ from scipy import ndimage
 from pathlib import Path
 import yaml
 import logging
+from segment_anything import sam_model_registry, SamPredictor
 
 
 def image_to_annotations(img_fn: str, out_dir: str) -> None:
@@ -74,6 +75,7 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
     # calculate the coordinates of the character bounding box
     bbox = np.array(detection_results[0]['bbox'])
     l, t, r, b = [round(x) for x in bbox]
+    bbox = np.array([l, t, r, b])
 
     # dump the bounding box results to file
     with open(str(outdir/'bounding_box.yaml'), 'w') as f:
@@ -88,7 +90,7 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
     cropped = img[t:b, l:r]
 
     # get segmentation mask
-    mask = segment(cropped)
+    mask = segment1(cropped, bbox)
 
     # send cropped image to pose estimator
     data_file = {'data': cv2.imencode('.png', cropped)[1].tobytes()}
@@ -222,6 +224,34 @@ def segment(img: np.ndarray):
     mask = 255 * mask.astype(np.uint8)
 
     return mask.T
+
+def segment1(img: np.ndarray,bbox):
+    sam_checkpoint = "sam_vit_l_0b3195.pth"
+    model_type = "vit_l"
+
+    device = "cuda"
+    sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+    sam.to(device=device)
+
+    predictor = SamPredictor(sam)
+    predictor.set_image(img)
+
+
+    masks, _, _ = predictor.predict(
+        point_coords=None,
+        point_labels=None,
+        box=bbox[None, :],
+        multimask_output=False,
+    )
+
+    masks = masks.astype('uint8')
+    masks = masks.reshape(masks.shape[-2], masks.shape[-1], 1)
+    masks = masks * 255
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
+    masks = cv2.morphologyEx(masks, cv2.MORPH_CLOSE, kernel, iterations=2)
+
+    return masks
 
 
 if __name__ == '__main__':

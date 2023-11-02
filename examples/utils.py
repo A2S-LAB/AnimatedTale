@@ -110,7 +110,6 @@ def crop(path):
     
     
 def mask(path):
-    
     oldx = oldy = 0
     color = [0, 255]
     thickness = 4
