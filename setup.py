@@ -24,7 +24,8 @@ setup(
         'requests==2.31.0',
         'torchserve==0.7.0',
         'tqdm==4.64.1',
-        'Flask==2.3.2'
+        'Flask==2.3.2',
+        'python-multipart==0.0.6',
     ],
     packages=find_packages(),
 )

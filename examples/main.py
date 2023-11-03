@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from starlette.responses import JSONResponse
 import os
 import cv2
+import uvicorn
 
 from pydantic import BaseModel
 import shutil
@@ -68,7 +69,7 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
     with Path(target_dir + file.filename).open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     image_to_annotations(target_dir + file.filename, target_dir)
-    
+
     return templates.TemplateResponse("texture.html", {"request": request})
 
 @app.get("/texture")
@@ -96,9 +97,9 @@ async def confirm(request: Request):
     return templates.TemplateResponse("confirm.html", {"request": request})
 
 @app.post("/move_gif")
-async def move_gif():    
+async def move_gif():
     global counter
-    
+
     video_name = f'video_{counter}.gif'
     counter = counter % 10 + 1
     shutil.copy("web_test/" + 'video.gif', "web_contents/exhibit/" + video_name)
@@ -121,7 +122,7 @@ async def bbox():
     return {"bbox": bbox.tolist()}
 
 
-    
+
 @app.post("/crop_image")
 async def crop_image(request: Request):
     try:
@@ -133,11 +134,15 @@ async def crop_image(request: Request):
         image = image[y:y+height, x:x+width]
         image = cv2.resize(image, (texture_img.shape[1], texture_img.shape[0]), interpolation=cv2.INTER_LINEAR)
         # cv2.imwrite("web_test/texture.png", image)
-        
+
         return {"success": True}
     except Exception as e:
         return JSONResponse(content={"status": "error", "detail": str(e)}, status_code=400)
-    
+
 @app.get("/motion")
 async def motion(request: Request):
     return templates.TemplateResponse("motion.html", {"request": request})
+
+
+if __name__ == '__main__':
+    uvicorn.run( app="main:app", host="0.0.0.0", port=8886)
