@@ -70,6 +70,7 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
 
     # 요거 이미지 texture, mask, joint 3개 다 사이즈가 같아야 합니다!
     # 일단 기존 함수로 바꿔놨습니다.
+    # 잘 돌아가는거 확인 하고 main.py에 업데이트 하면 될 것 같습니다.
 
     # predict_mask(target_dir + file.filename, target_dir)
     # predict_joint(target_dir + file.filename, target_dir)

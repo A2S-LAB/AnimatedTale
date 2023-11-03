@@ -13,7 +13,7 @@ import shutil
 from pathlib import Path
 import logging
 
-from image_to_annotations1 import image_to_annotations
+from image_to_annotations import image_to_annotations
 from annotations_to_animation import annotations_to_animation
 from image_to_animation import ani_main
 from chatGPTAPI import createStory

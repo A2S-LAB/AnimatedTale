@@ -276,4 +276,4 @@ def predict_joint(img_path: str, out_dir: str) -> None:
     
     # convert texture to RGBA and save
     img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-    cv2.imwrite(str(outdir/'texture.png'), img)
+    cv2.imwrite(f"{out_dir}/texture.png", img)
