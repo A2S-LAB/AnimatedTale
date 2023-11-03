@@ -20,5 +20,6 @@ To be downloaded here: https://drive.google.com/drive/folders/1OEPVllbxKPWi5z22P
 
 ## Start project
 ```bash
-python
+cd examples
+python main.py
 ```
