@@ -2,7 +2,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-from image_to_annotations1 import image_to_annotations
+from image_to_annotations import image_to_annotations
 from annotations_to_animation import annotations_to_animation
 from pathlib import Path
 import logging

@@ -1,30 +1,25 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
-
+import os
 import sys
 import requests
 import cv2
 import json
 import numpy as np
-from skimage import measure
-from scipy import ndimage
 from pathlib import Path
 import yaml
 import logging
 from segment_anything import sam_model_registry, SamPredictor
+from utils import *
 
+
+sam_checkpoint = "sam_vit_l_0b3195.pth"
+model_type = "vit_l"
+
+device = "cuda"
+
+if not os.path.exists("mask"):
+    os.makedirs("mask")
 
 def image_to_annotations(img_fn: str, out_dir: str) -> None:
-    """
-    Given the RGB image located at img_fn, runs detection, segmentation, and pose estimation for drawn character within it.
-    Crops the image and saves texture, mask, and character config files necessary for animation. Writes to out_dir.
-
-    Params:
-        img_fn: path to RGB image
-        out_dir: directory where outputs will be saved
-    """
-
     # create output directory
     outdir = Path(out_dir)
     outdir.mkdir(exist_ok=True)
@@ -46,38 +41,10 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
         scale = 1000 / np.max(img.shape)
         img = cv2.resize(img, (round(scale * img.shape[1]), round(scale * img.shape[0])))
 
-    # convert to bytes and send to torchserve
-    img_b = cv2.imencode('.png', img)[1].tobytes()
-    request_data = {'data': img_b}
-    resp = requests.post("http://localhost:8080/predictions/drawn_humanoid_detector", files=request_data, verify=False)
-    if resp is None or resp.status_code >= 300:
-        raise Exception(f"Failed to get bounding box, please check if the 'docker_torchserve' is running and healthy, resp: {resp}")
+    bbox = auto_bbox(img)
 
-    detection_results = json.loads(resp.content)
-
-    # error check detection_results
-    if type(detection_results) == dict and 'code' in detection_results.keys() and detection_results['code'] == 404:
-        assert False, f'Error performing detection. Check that drawn_humanoid_detector.mar was properly downloaded. Response: {detection_results}'
-
-    # order results by score, descending
-    detection_results.sort(key=lambda x: x['score'], reverse=True)
-
-    # if no drawn humanoids detected, abort
-    if len(detection_results) == 0:
-        msg = 'Could not detect any drawn humanoids in the image. Aborting'
-        logging.critical(msg)
-        assert False, msg
-
-    # otherwise, report # detected and score of highest.
-    msg = f'Detected {len(detection_results)} humanoids in image. Using detection with highest score {detection_results[0]["score"]}.'
-    logging.info(msg)
-
-    # calculate the coordinates of the character bounding box
-    bbox = np.array(detection_results[0]['bbox'])
     l, t, r, b = [round(x) for x in bbox]
-    bbox = np.array([l, t, r, b])
 
-    # dump the bounding box results to file
     with open(str(outdir/'bounding_box.yaml'), 'w') as f:
         yaml.dump({
             'left': l,
@@ -86,14 +53,13 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
             'bottom': b
         }, f)
 
-    # crop the image
     cropped = img[t:b, l:r]
 
     # get segmentation mask
-    mask = segment1(cropped, bbox)
+    mask = segment1(img)
 
     # send cropped image to pose estimator
-    data_file = {'data': cv2.imencode('.png', cropped)[1].tobytes()}
+    data_file = {'data': cv2.imencode('.png', img)[1].tobytes()} ## copped
     resp = requests.post("http://localhost:8080/predictions/drawn_humanoid_pose_estimator", files=data_file, verify=False)
     if resp is None or resp.status_code >= 300:
         raise Exception(f"Failed to get skeletons, please check if the 'docker_torchserve' is running and healthy, resp: {resp}")
@@ -139,11 +105,11 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
     skeleton.append({'loc' : [round(x) for x in  kpts[15]            ], 'name': 'left_foot'     , 'parent': 'left_knee'})
 
     # create the character config dictionary
-    char_cfg = {'skeleton': skeleton, 'height': cropped.shape[0], 'width': cropped.shape[1]}
+    char_cfg = {'skeleton': skeleton, 'height': img.shape[0], 'width': img.shape[1]}
 
     # convert texture to RGBA and save
-    cropped = cv2.cvtColor(cropped, cv2.COLOR_BGR2BGRA)
-    cv2.imwrite(str(outdir/'texture.png'), cropped)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+    cv2.imwrite(str(outdir/'texture.png'), img)
 
     # save mask
     cv2.imwrite(str(outdir/'mask.png'), mask)
@@ -153,7 +119,7 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
         yaml.dump(char_cfg, f)
 
     # create joint viz overlay for inspection purposes
-    joint_overlay = cropped.copy()
+    joint_overlay = img.copy()
     for joint in skeleton:
         x, y = joint['loc']
         name = joint['name']
@@ -161,75 +127,13 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
         cv2.putText(joint_overlay, name, (int(x), int(y+15)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, 2)
     cv2.imwrite(str(outdir/'joint_overlay.png'), joint_overlay)
 
-    return {
-        "cropped": 'texture.png',
-        "mask": 'mask.png',
-        "joint_overlay":'joint_overlay.png'
-    }
 
+def segment1(img: np.ndarray):
+    # image = cv2.imread(img)
+    # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-def segment(img: np.ndarray):
-    """ threshold """
-    img = np.min(img, axis=2)
-    img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 115, 8)
-    img = cv2.bitwise_not(img)
+    bbox = auto_bbox(img)
 
-    """ morphops """
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=2)
-    img = cv2.morphologyEx(img, cv2.MORPH_DILATE, kernel, iterations=2)
-
-    """ floodfill """
-    mask = np.zeros([img.shape[0]+2, img.shape[1]+2], np.uint8)
-    mask[1:-1, 1:-1] = img.copy()
-
-    # im_floodfill is results of floodfill. Starts off all white
-    im_floodfill = np.full(img.shape, 255, np.uint8)
-
-    # choose 10 points along each image side. use as seed for floodfill.
-    h, w = img.shape[:2]
-    for x in range(0, w-1, 10):
-        cv2.floodFill(im_floodfill, mask, (x, 0), 0)
-        cv2.floodFill(im_floodfill, mask, (x, h-1), 0)
-    for y in range(0, h-1, 10):
-        cv2.floodFill(im_floodfill, mask, (0, y), 0)
-        cv2.floodFill(im_floodfill, mask, (w-1, y), 0)
-
-    # make sure edges aren't character. necessary for contour finding
-    im_floodfill[0, :] = 0
-    im_floodfill[-1, :] = 0
-    im_floodfill[:, 0] = 0
-    im_floodfill[:, -1] = 0
-
-    """ retain largest contour """
-    mask2 = cv2.bitwise_not(im_floodfill)
-    mask = None
-    biggest = 0
-
-    contours = measure.find_contours(mask2, 0.0)
-    for c in contours:
-        x = np.zeros(mask2.T.shape, np.uint8)
-        cv2.fillPoly(x, [np.int32(c)], 1)
-        size = len(np.where(x == 1)[0])
-        if size > biggest:
-            mask = x
-            biggest = size
-
-    if mask is None:
-        msg = 'Found no contours within image'
-        logging.critical(msg)
-        assert False, msg
-
-    mask = ndimage.binary_fill_holes(mask).astype(int)
-    mask = 255 * mask.astype(np.uint8)
-
-    return mask.T
-
-def segment1(img: np.ndarray,bbox):
-    sam_checkpoint = "sam_vit_l_0b3195.pth"
-    model_type = "vit_l"
-
-    device = "cuda"
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     sam.to(device=device)
 
@@ -252,7 +156,6 @@ def segment1(img: np.ndarray,bbox):
     masks = cv2.morphologyEx(masks, cv2.MORPH_CLOSE, kernel, iterations=2)
 
     return masks
-
 
 if __name__ == '__main__':
     log_dir = Path('./logs')

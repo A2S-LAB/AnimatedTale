@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
-
+from segment_anything import sam_model_registry, SamPredictor
+import requests
+import json
+import logging
+import yaml
 
 def auto_bbox(image, th=160):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -166,3 +170,110 @@ def mask(path):
             
     cv2.destroyAllWindows()
     cv2.imwrite(path + '/mask.png', mask_copy)
+    
+def predict_mask(img_path: str, out_dir: str) -> None:
+    sam_checkpoint = "sam_vit_l_0b3195.pth"
+    model_type = "vit_l"
+    device = "cuda"
+
+    #Loading image
+    img = cv2.imread(img_path)
+    
+    #bbox(ndarray)
+    bbox = auto_bbox(img)
+    
+    #Pre-process
+    sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+    sam.to(device=device)
+
+    predictor = SamPredictor(sam)
+    predictor.set_image(img)
+    
+    #Predict mask as SAM
+    masks, _, _ = predictor.predict(
+        point_coords=None,
+        point_labels=None,
+        box=bbox[None, :],
+        multimask_output=False,
+    )
+    
+    #Post-process
+    masks = masks.astype('uint8')
+    masks = masks.reshape(masks.shape[-2], masks.shape[-1], 1)
+    masks = masks * 255
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
+    masks = cv2.morphologyEx(masks, cv2.MORPH_CLOSE, kernel, iterations=2)
+    
+    #Saving mask
+    cv2.imwrite(f"{out_dir}/mask.png", masks)
+    
+def predict_joint(img_path: str, out_dir: str) -> None:
+    #Loading image
+    img = cv2.imread(img_path) 
+    
+    # send cropped image to pose estimator
+    data_file = {'data': cv2.imencode('.png', img)[1].tobytes()} ## copped
+    resp = requests.post("http://localhost:8080/predictions/drawn_humanoid_pose_estimator", files=data_file, verify=False)
+    if resp is None or resp.status_code >= 300:
+        raise Exception(f"Failed to get skeletons, please check if the 'docker_torchserve' is running and healthy, resp: {resp}")
+
+    pose_results = json.loads(resp.content)
+
+    # error check pose_results
+    if type(pose_results) == dict and 'code' in pose_results.keys() and pose_results['code'] == 404:
+        assert False, f'Error performing pose estimation. Check that drawn_humanoid_pose_estimator.mar was properly downloaded. Response: {pose_results}'
+
+    # if more than one skeleton detected, abort
+    if len(pose_results) == 0:
+        msg = 'Could not detect any skeletons within the character bounding box. Expected exactly 1. Aborting.'
+        logging.critical(msg)
+        assert False, msg
+
+    # if more than one skeleton detected,
+    if 1 < len(pose_results):
+        msg = f'Detected {len(pose_results)} skeletons with the character bounding box. Expected exactly 1. Aborting.'
+        logging.critical(msg)
+        assert False, msg
+
+    # get x y coordinates of detection joint keypoints
+    kpts = np.array(pose_results[0]['keypoints'])[:, :2]
+
+    # use them to build character skeleton rig
+    skeleton = []
+    skeleton.append({'loc' : [round(x) for x in (kpts[11]+kpts[12])/2], 'name': 'root'          , 'parent': None})
+    skeleton.append({'loc' : [round(x) for x in (kpts[11]+kpts[12])/2], 'name': 'hip'           , 'parent': 'root'})
+    skeleton.append({'loc' : [round(x) for x in (kpts[5]+kpts[6])/2  ], 'name': 'torso'         , 'parent': 'hip'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[0]             ], 'name': 'neck'          , 'parent': 'torso'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[6]             ], 'name': 'right_shoulder', 'parent': 'torso'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[8]             ], 'name': 'right_elbow'   , 'parent': 'right_shoulder'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[10]            ], 'name': 'right_hand'    , 'parent': 'right_elbow'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[5]             ], 'name': 'left_shoulder' , 'parent': 'torso'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[7]             ], 'name': 'left_elbow'    , 'parent': 'left_shoulder'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[9]             ], 'name': 'left_hand'     , 'parent': 'left_elbow'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[12]            ], 'name': 'right_hip'     , 'parent': 'root'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[14]            ], 'name': 'right_knee'    , 'parent': 'right_hip'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[16]            ], 'name': 'right_foot'    , 'parent': 'right_knee'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[11]            ], 'name': 'left_hip'      , 'parent': 'root'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[13]            ], 'name': 'left_knee'     , 'parent': 'left_hip'})
+    skeleton.append({'loc' : [round(x) for x in  kpts[15]            ], 'name': 'left_foot'     , 'parent': 'left_knee'})
+
+    # create the character config dictionary
+    char_cfg = {'skeleton': skeleton, 'height': img.shape[0], 'width': img.shape[1]}
+
+    # dump character config to yaml
+    with open(f"{out_dir}/char_cfg.yaml", 'w') as f:
+        yaml.dump(char_cfg, f)
+
+    # create joint viz overlay for inspection purposes
+    joint_overlay = img.copy()
+    for joint in skeleton:
+        x, y = joint['loc']
+        name = joint['name']
+        cv2.circle(joint_overlay, (int(x), int(y)), 5, (0, 0, 0), 5)
+        cv2.putText(joint_overlay, name, (int(x), int(y+15)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, 2)
+    cv2.imwrite(f"{out_dir}/joint_overlay.png", joint_overlay)
+    
+    # convert texture to RGBA and save
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+    cv2.imwrite(str(outdir/'texture.png'), img)
