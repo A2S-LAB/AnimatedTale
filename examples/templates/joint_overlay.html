@@ -132,6 +132,26 @@
             background-color: #B0E0E6;
         }
 
+        .btn-next {
+            position: absolute;
+            right: 12vw;
+            bottom: 1vw;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif;
+            font-size: 1vw;
+            text-decoration: none;
+            margin-top: 2vh;
+            padding: 1vh 2vw;
+            border: 0.08vw solid #ccc;
+            border-radius: 0.4vw;
+            cursor: pointer;
+            background-color: #87CEFA;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-next:hover {
+            background-color: #B0E0E6;
+        }
+
         /* ------------- decos----------------------*/
         .balloon {
             position: absolute;
@@ -239,15 +259,7 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        #joint_overlay {
-            max-height: 100%;
-            display: block;
-            margin: auto;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+
 
     </style>
     
@@ -263,10 +275,7 @@
             <img id="joint_overlay" src="/get_image/web_test/joint_overlay.png" alt="joint_overlay">
         </div>
         <a href="/mask" class="btn-prev">Prev</a>
-        
-        <form action="/make_gif" enctype="multipart/form-data" method="post">
-            <input type="submit" class="btn-common btn-submit" value="Submit">
-        </form>
+        <a href="/motion" class="btn-next">Next</a>
     </div>
 
     <svg class="balloon" style="left: 5%; width: 60px; animation-delay: 1s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>

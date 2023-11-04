@@ -1,9 +1,7 @@
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse, RedirectResponse
-from fastapi import FastAPI, UploadFile, File, Request, WebSocket, Depends, status
+from fastapi import FastAPI, UploadFile, File, Request, status, Form
 from fastapi.staticfiles import StaticFiles
-from fastapi import HTTPException
-from starlette.responses import JSONResponse
 import os
 import cv2
 
@@ -12,11 +10,7 @@ import shutil
 from pathlib import Path
 import logging
 
-from image_to_annotations import image_to_annotations
 from annotations_to_animation import annotations_to_animation
-from image_to_animation import ani_main
-from chatGPTAPI import createStory
-from diffusion import makeBackground
 from utils import auto_bbox, predict_mask, predict_joint
 
 # uvicorn API:app --reload
@@ -34,29 +28,9 @@ templates = Jinja2Templates(directory="templates")
 def get_image(image_path: str):
     return FileResponse(image_path)
 
-@app.get("/get_video/{video_path:path}")
-def get_video(video_path: str):
-    return FileResponse(video_path)
-
 @app.get("/")
 def main_page(request: Request, video: str = None):
     return templates.TemplateResponse("index.html", {"request": request, "video": video})
-
-@app.get("/story")
-async def story_page(request: Request):
-    return templates.TemplateResponse("story.html", {"request": request})
-
-class StoryRequest(BaseModel):
-    prompt: str
-
-@app.post("/create_story")
-async def create_story_endpoint(request: StoryRequest):
-    try:
-        story = createStory(request.prompt)
-        return {"story": story}
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        raise HTTPException(status_code=500, detail="Story creation failed.")
 
 @app.get("/upload")
 async def upload_page(request: Request):
@@ -72,15 +46,11 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
     # 일단 기존 함수로 바꿔놨습니다.
     # 잘 돌아가는거 확인 하고 main.py에 업데이트 하면 될 것 같습니다.
 
-    # predict_mask(target_dir + file.filename, target_dir)
-    # predict_joint(target_dir + file.filename, target_dir)
-    image_to_annotations(target_dir + file.filename, target_dir)
+    predict_mask(target_dir + file.filename, target_dir)
+    predict_joint(target_dir + file.filename, target_dir)
+#     image_to_annotations(target_dir + file.filename, target_dir)
     
-    return templates.TemplateResponse("texture.html", {"request": request})
-
-@app.get("/texture")
-async def texture(request: Request):
-    return templates.TemplateResponse("texture.html", {"request": request})
+    return templates.TemplateResponse("mask.html", {"request": request})
 
 @app.get("/mask")
 async def mask(request: Request):
@@ -91,10 +61,10 @@ async def joint_overlay(request: Request):
     return templates.TemplateResponse("joint_overlay.html", {"request": request})
 
 @app.post("/make_gif")
-async def make_gif():
+async def make_gif(gif_name: str = Form(...)):
     target_dir = "web_test/"
-    motion_cfg_fn = 'config/motion/jumping_jacks.yaml'
-    retarget_cfg_fn = 'config/retarget/cmu1_pfp.yaml'
+    motion_cfg_fn = f'config/motion/{gif_name}.yaml'
+    retarget_cfg_fn = 'config/retarget/cmu1_pfp_copy.yaml'
     annotations_to_animation(target_dir, motion_cfg_fn, retarget_cfg_fn)
     return RedirectResponse(url="/confirm", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -126,22 +96,6 @@ async def bbox():
     image = cv2.imread("web_test/image.png")
     bbox = auto_bbox(image)
     return {"bbox": bbox.tolist()}
-
-@app.post("/crop_image")
-async def crop_image(request: Request):
-    try:
-        data = await request.json()
-        scale = float(data["scale"])
-        x, y, width, height = int(data["x"] / scale), int(data["y"] / scale), int(data["width"] / scale), int(data["height"] / scale)
-        image = cv2.imread("web_test/image.png")
-        texture_img = cv2.imread("web_test/texture.png")
-        image = image[y:y+height, x:x+width]
-        image = cv2.resize(image, (texture_img.shape[1], texture_img.shape[0]), interpolation=cv2.INTER_LINEAR)
-        # cv2.imwrite("web_test/texture.png", image)
-        
-        return {"success": True}
-    except Exception as e:
-        return JSONResponse(content={"status": "error", "detail": str(e)}, status_code=400)
     
 @app.get("/motion")
 async def motion(request: Request):

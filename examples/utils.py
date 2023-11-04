@@ -172,19 +172,26 @@ def mask(path):
     cv2.imwrite(path + '/mask.png', mask_copy)
     
 def predict_mask(img_path: str, out_dir: str) -> None:
-    sam_checkpoint = "sam_vit_l_0b3195.pth"
-    model_type = "vit_l"
-    device = "cuda"
-
     #Loading image
     img = cv2.imread(img_path)
+    
+    # ensure it's rgb
+    if len(img.shape) != 3:
+        msg = f'image must have 3 channels (rgb). Found {len(img.shape)}'
+        logging.critical(msg)
+        assert False, msg
+
+    # resize if needed
+    if np.max(img.shape) > 1000:
+        scale = 1000 / np.max(img.shape)
+        img = cv2.resize(img, (round(scale * img.shape[1]), round(scale * img.shape[0])))
     
     #bbox(ndarray)
     bbox = auto_bbox(img)
     
     #Pre-process
-    sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-    sam.to(device=device)
+    sam = sam_model_registry["vit_l"](checkpoint="sam_vit_l_0b3195.pth")
+    sam.to(device="cuda")
 
     predictor = SamPredictor(sam)
     predictor.set_image(img)
@@ -211,6 +218,17 @@ def predict_mask(img_path: str, out_dir: str) -> None:
 def predict_joint(img_path: str, out_dir: str) -> None:
     #Loading image
     img = cv2.imread(img_path) 
+    
+    # ensure it's rgb
+    if len(img.shape) != 3:
+        msg = f'image must have 3 channels (rgb). Found {len(img.shape)}'
+        logging.critical(msg)
+        assert False, msg
+
+    # resize if needed
+    if np.max(img.shape) > 1000:
+        scale = 1000 / np.max(img.shape)
+        img = cv2.resize(img, (round(scale * img.shape[1]), round(scale * img.shape[0])))
     
     # send cropped image to pose estimator
     data_file = {'data': cv2.imencode('.png', img)[1].tobytes()} ## copped
