@@ -15,10 +15,11 @@ from annotations_to_animation import annotations_to_animation
 from utils import auto_bbox, predict_mask, predict_joint
 
 logging.basicConfig(level=logging.INFO)
-counter = 0 
+counter = 0
 
 app = FastAPI()
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
+app.mount("/css", StaticFiles(directory="templates/css/"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -42,7 +43,7 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
 
     predict_mask(target_dir + file.filename, target_dir)
     predict_joint(target_dir + file.filename, target_dir)
-    
+
     return templates.TemplateResponse("mask.html", {"request": request})
 
 @app.get("/mask")
@@ -66,9 +67,9 @@ async def confirm(request: Request):
     return templates.TemplateResponse("confirm.html", {"request": request})
 
 @app.post("/move_gif")
-async def move_gif():    
+async def move_gif():
     global counter
-    
+
     video_name = f'video_{counter}.gif'
     counter = counter % 10 + 1
     shutil.copy("web_test/" + 'video.gif', "web_contents/exhibit/" + video_name)
@@ -89,7 +90,7 @@ async def bbox():
     image = cv2.imread("web_test/image.png")
     bbox = auto_bbox(image)
     return {"bbox": bbox.tolist()}
-    
+
 @app.get("/motion")
 async def motion(request: Request):
     return templates.TemplateResponse("motion.html", {"request": request})
