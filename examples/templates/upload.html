@@ -18,12 +18,13 @@
             <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
         </div>
         <div class="button-container">
-            <button class="btn-common btn-upload">Upload</button>
-            <input class="file" type="file" name="file" />
+            <form action="/process_upload" enctype="multipart/form-data" method="post" id="uploadForm">
+                <input class="file" type="file" name="file" id="fileInput" />
+                <input type="submit" class="btn-common btn-submit" id="submitButton" value="Submit" style="display:none">
+            </form>
+            <label for="fileInput" class="btn-common btn-upload">Upload</label>
         </div>
-        <form action="/process_upload" enctype="multipart/form-data" method="post">
-            <input type="submit" class="btn-common btn-submit" value="Submit" style="display:none">
-        </form>
+        
     </div>
     <div id="submittedMessage" class="submitted-popup">
         Submitted
@@ -57,14 +58,21 @@
         const div = document.querySelector('.btn-upload');
         const submit = document.querySelector('.btn-submit');
 
-        div.addEventListener('click', () => input.click());
+        document.getElementById('fileInput').addEventListener('change', function() {
+            var submitButton = document.getElementById('submitButton');
+            if(this.files.length > 0) {
+                submitButton.style.display = 'inline';
+            } else {
+                submitButton.style.display = 'none';
+            }
+        });
         document.querySelector('input[type="file"]').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     imgElement.src = e.target.result;
-                    imgElement.style.display = "block"; // Show the uploaded image
+                    imgElement.style.display = "block";
                     imgElement.onload = function() {
                         const width = canvas.offsetWidth
                         const height = canvas.offsetHeight
