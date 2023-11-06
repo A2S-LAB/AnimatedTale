@@ -58,7 +58,15 @@ async def joint_overlay(request: Request):
 async def make_gif(gif_name: str = Form(...)):
     target_dir = "web_test/"
     motion_cfg_fn = f'config/motion/{gif_name}.yaml'
-    retarget_cfg_fn = 'config/retarget/cmu1_pfp_copy.yaml'
+    if gif_name == 'hi' or gif_name == 'hurray' or gif_name =='jelly':
+        retarget_file = 'cmu1_pfp_copy'
+    elif gif_name == 'jesse_dance':
+        retarget_file = 'mixamo_fff'
+    elif gif_name == 'jumping_jacks':
+        retarget_file = 'cmu1_pfp'
+    else:
+        retarget_file = 'fair1_ppf'
+    retarget_cfg_fn = f'config/retarget/{retarget_file}.yaml'
     annotations_to_animation(target_dir, motion_cfg_fn, retarget_cfg_fn)
     return RedirectResponse(url="/confirm", status_code=status.HTTP_303_SEE_OTHER)
 
