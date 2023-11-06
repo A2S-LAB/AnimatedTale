@@ -14,8 +14,13 @@ import logging
 from annotations_to_animation import annotations_to_animation
 from utils import auto_bbox, predict_mask, predict_joint
 
+from segment_anything import sam_model_registry, SamPredictor
+
 logging.basicConfig(level=logging.INFO)
 counter = 0
+
+# sam
+sam = sam_model_registry["vit_l"](checkpoint="sam_vit_l_0b3195.pth")
 
 app = FastAPI()
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
@@ -28,7 +33,7 @@ def get_image(image_path: str):
     return FileResponse(image_path)
 
 @app.get("/")
-def main_page(request: Request, video: str = None):
+def main_page(request: Request, video: str = ""):
     return templates.TemplateResponse("index.html", {"request": request, "video": video})
 
 @app.get("/upload")
@@ -38,11 +43,12 @@ async def upload_page(request: Request):
 @app.post("/process_upload")
 async def process_upload(request: Request, file: UploadFile = File(...)):
     target_dir = "web_test/"
-    with Path(target_dir + file.filename).open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # with Path(target_dir + file.filename).open("wb") as buffer:
+    #     shutil.copyfileobj(file.file, buffer)
 
-    predict_mask(target_dir + file.filename, target_dir)
-    predict_joint(target_dir + file.filename, target_dir)
+    mask = await predict_mask(sam, file)
+    cv2.imwrite("web_test/test2.png", mask)
+    # predict_joint(target_dir + file.filename, target_dir)
 
     return templates.TemplateResponse("mask.html", {"request": request})
 
@@ -104,4 +110,4 @@ async def motion(request: Request):
     return templates.TemplateResponse("motion.html", {"request": request})
 
 if __name__ == '__main__':
-    uvicorn.run( app="main:app", host="0.0.0.0", port=8886)
+    uvicorn.run( app="main:app", host="0.0.0.0", port=8886, reload=True)
