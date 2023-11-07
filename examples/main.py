@@ -6,6 +6,7 @@ import os
 import cv2
 import uvicorn
 
+import numpy as np
 from pydantic import BaseModel
 import shutil
 from pathlib import Path
@@ -46,9 +47,13 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
     # with Path(target_dir + file.filename).open("wb") as buffer:
     #     shutil.copyfileobj(file.file, buffer)
 
-    mask = await predict_mask(sam, file)
-    cv2.imwrite("web_test/test2.png", mask)
-    # predict_joint(target_dir + file.filename, target_dir)
+    # convert buffer to image
+    img = await file.read()
+    img = np.frombuffer(img, dtype=np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
+
+    # mask = await predict_mask(sam, img)
+    predict_joint(img, target_dir + file.filename, target_dir)
 
     return templates.TemplateResponse("mask.html", {"request": request})
 
