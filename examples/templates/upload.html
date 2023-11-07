@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/get_image/web_contents/AT_Logo.ico" type="image/x-icon">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <title>Animated Tale</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script src="/js/util.js"></script>
 </head>
 <body>
     <h1 class="title">Animated Tale</h1>
@@ -16,15 +18,15 @@
     <div class="canvas-container">
         <div class="canvas">
             <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
+            <svg class="svg" id="svg" style="display: none"></svg>
         </div>
         <div class="button-container">
-            <form action="/process_upload" enctype="multipart/form-data" method="post" id="uploadForm">
-                <input class="file" type="file" name="file" id="fileInput" />
-                <input type="submit" class="btn-common btn-submit" id="submitButton" value="Submit" style="display:none">
-            </form>
+            <input class="file" type="file" name="file" id="fileInput" />
             <label for="fileInput" class="btn-common btn-upload">Upload</label>
+            <input class="file" name="" id="submitInput" />
+            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="get_skeleton()" style="display:none">Submit</label>
+            <!-- <button class="btn-common btn-submit" style="display:none" id="submitButton" onclick="get_skeleton()">사진 전송</button> -->
         </div>
-        
     </div>
     <div id="submittedMessage" class="submitted-popup">
         Submitted
@@ -62,6 +64,7 @@
             var submitButton = document.getElementById('submitButton');
             if(this.files.length > 0) {
                 submitButton.style.display = 'inline';
+                div.style.display = "none"
             } else {
                 submitButton.style.display = 'none';
             }
@@ -85,14 +88,7 @@
                     }
                 }
                 reader.readAsDataURL(file);
-                div.style.display = "none"
-                submit.style.display = "block"
-
             }
-        });
-
-        document.querySelector('input[type="submit"]').addEventListener('click', function() {
-            document.getElementById('processingMessage').style.display = "block";
         });
 
         window.onload = function() {
@@ -117,7 +113,6 @@
                 imgElement.style.height = (height - padding)+ "px";
             }
         });
-
 
     </script>
 </body>

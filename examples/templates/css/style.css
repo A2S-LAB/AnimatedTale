@@ -4,6 +4,7 @@ body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif; backg
 .canvas-container { position: relative; display: flex; justify-content: center; align-items: center; background-color: rgba(255, 255, 255, 0.5); flex-direction: column; margin-bottom: 5vh; width: 100%; padding: 2vh 0; }
 .canvas { position: relative; width: 40vw; height: 50vh; background-color: white; border: 0.1vw solid #ccc; box-shadow: 0 0.4vw 0.8vw rgba(0, 0, 0, 0.1); padding: 2vh; text-align: center; margin-top: 1vh; border-radius: 1.5vw; }
 
+.svg{position: absolute; top: 2vh; left: 2vh}
 /* -----------------------Buttons-------------------------------*/
 .btn-common { font-size: 1.5vw; padding: 1.5vh 2vw; margin: 0 0.5vw; border: 0.08vw solid #ccc; border-radius: 0.4vw; cursor: pointer; transition: background-color 0.3s; min-width: 20vw; text-align: center; }
 .btn-create { background-color: #333; color: #FFF; }

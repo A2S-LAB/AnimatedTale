@@ -2,6 +2,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi import FastAPI, UploadFile, File, Request, status, Form
 from fastapi.staticfiles import StaticFiles
+from typing import List
 import os
 import cv2
 import uvicorn
@@ -26,6 +27,7 @@ sam = sam_model_registry["vit_l"](checkpoint="sam_vit_l_0b3195.pth")
 app = FastAPI()
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 app.mount("/css", StaticFiles(directory="templates/css/"), name="static")
+app.mount("/js", StaticFiles(directory="templates/js/"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -40,6 +42,26 @@ def main_page(request: Request, video: str = ""):
 @app.get("/upload")
 async def upload_page(request: Request):
     return templates.TemplateResponse("upload.html", {"request": request, "video": None})
+
+class upload_result(BaseModel):
+    coordinate : List[int]
+    shape : List[int]
+
+@app.post("/process_skeleton", response_model=None)
+async def process_upload(file: UploadFile = File(...)) -> upload_result:
+    target_dir = "web_test/"
+
+    img = await file.read()
+    img = np.frombuffer(img, dtype=np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
+
+    predict_result = predict_joint(img, target_dir + file.filename, target_dir)
+
+    return {
+        "shape": img.shape[:2][::-1],
+        "coordinate": predict_result
+    }
+
 
 @app.post("/process_upload")
 async def process_upload(request: Request, file: UploadFile = File(...)):

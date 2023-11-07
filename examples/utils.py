@@ -177,7 +177,7 @@ def mask(path):
     cv2.destroyAllWindows()
     cv2.imwrite(path + '/mask.png', mask_copy)
 
-async def predict_mask(sam: modeling.sam.Sam, img:UploadFile) -> np.ndarray:
+async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray) -> np.ndarray:
 
     # ensure it's rgb
     if len(img.shape) != 3:
@@ -217,7 +217,7 @@ async def predict_mask(sam: modeling.sam.Sam, img:UploadFile) -> np.ndarray:
 
     return masks
 
-def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
+def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
     #Loading image
     # img = cv2.imread(img_path)
 
@@ -279,22 +279,22 @@ def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
     skeleton.append({'loc' : [round(x) for x in  kpts[15]            ], 'name': 'left_foot'     , 'parent': 'left_knee'})
 
     output = []
-    output.append((kpts[11]+kpts[12])/2)
-    output.append((kpts[11]+kpts[12])/2)
-    outupt.append((kpts[5]+kpts[6])/2)
-    outupt.append(kpts[0])
-    outupt.append(kpts[6])
-    outupt.append(kpts[8])
-    outupt.append(kpts[10])
-    outupt.append(kpts[5])
-    outupt.append(kpts[7])
-    outupt.append(kpts[9])
-    outupt.append(kpts[12])
-    outupt.append(kpts[14])
-    outupt.append(kpts[16])
-    outupt.append(kpts[11])
-    outupt.append(kpts[13])
-    outupt.append(kpts[15])
+    output.append(list((kpts[11]+kpts[12])/2))
+    output.append(list((kpts[11]+kpts[12])/2))
+    output.append(list((kpts[5]+kpts[6])/2))
+    output.append(list(kpts[0]))
+    output.append(list(kpts[6]))
+    output.append(list(kpts[8]))
+    output.append(list(kpts[10]))
+    output.append(list(kpts[5]))
+    output.append(list(kpts[7]))
+    output.append(list(kpts[9]))
+    output.append(list(kpts[12]))
+    output.append(list(kpts[14]))
+    output.append(list(kpts[16]))
+    output.append(list(kpts[11]))
+    output.append(list(kpts[13]))
+    output.append(list(kpts[15]))
 
     # create the character config dictionary
     char_cfg = {'skeleton': skeleton, 'height': img.shape[0], 'width': img.shape[1]}
