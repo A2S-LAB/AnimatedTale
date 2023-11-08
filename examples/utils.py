@@ -5,6 +5,7 @@ import requests
 import json
 import logging
 import yaml
+from typing import List
 
 import torch
 from fastapi import UploadFile
@@ -176,12 +177,7 @@ def mask(path):
     cv2.destroyAllWindows()
     cv2.imwrite(path + '/mask.png', mask_copy)
 
-async def predict_mask(sam: modeling.sam.Sam, inputs:UploadFile) -> np.ndarray:
-
-    # convert buffer to image
-    img = await inputs.read()
-    img = np.frombuffer(img, dtype=np.uint8)
-    img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
+async def predict_mask(sam: modeling.sam.Sam, img:UploadFile) -> np.ndarray:
 
     # ensure it's rgb
     if len(img.shape) != 3:
@@ -221,15 +217,15 @@ async def predict_mask(sam: modeling.sam.Sam, inputs:UploadFile) -> np.ndarray:
 
     return masks
 
-def predict_joint(img_path: str, out_dir: str) -> None:
+def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
     #Loading image
-    img = cv2.imread(img_path)
+    # img = cv2.imread(img_path)
 
     # ensure it's rgb
-    if len(img.shape) != 3:
-        msg = f'image must have 3 channels (rgb). Found {len(img.shape)}'
-        logging.critical(msg)
-        assert False, msg
+    # if len(img.shape) != 3:
+    #     msg = f'image must have 3 channels (rgb). Found {len(img.shape)}'
+    #     logging.critical(msg)
+    #     assert False, msg
 
     # resize if needed
     if np.max(img.shape) > 1000:
@@ -282,6 +278,24 @@ def predict_joint(img_path: str, out_dir: str) -> None:
     skeleton.append({'loc' : [round(x) for x in  kpts[13]            ], 'name': 'left_knee'     , 'parent': 'left_hip'})
     skeleton.append({'loc' : [round(x) for x in  kpts[15]            ], 'name': 'left_foot'     , 'parent': 'left_knee'})
 
+    output = []
+    output.append((kpts[11]+kpts[12])/2)
+    output.append((kpts[11]+kpts[12])/2)
+    outupt.append((kpts[5]+kpts[6])/2)
+    outupt.append(kpts[0])
+    outupt.append(kpts[6])
+    outupt.append(kpts[8])
+    outupt.append(kpts[10])
+    outupt.append(kpts[5])
+    outupt.append(kpts[7])
+    outupt.append(kpts[9])
+    outupt.append(kpts[12])
+    outupt.append(kpts[14])
+    outupt.append(kpts[16])
+    outupt.append(kpts[11])
+    outupt.append(kpts[13])
+    outupt.append(kpts[15])
+
     # create the character config dictionary
     char_cfg = {'skeleton': skeleton, 'height': img.shape[0], 'width': img.shape[1]}
 
@@ -291,13 +305,15 @@ def predict_joint(img_path: str, out_dir: str) -> None:
 
     # create joint viz overlay for inspection purposes
     joint_overlay = img.copy()
-    for joint in skeleton:
+    for idx,joint in enumerate(skeleton):
         x, y = joint['loc']
         name = joint['name']
         cv2.circle(joint_overlay, (int(x), int(y)), 5, (0, 0, 0), 5)
-        cv2.putText(joint_overlay, name, (int(x), int(y+15)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, 2)
+        cv2.putText(joint_overlay, str(idx), (int(x), int(y+15)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, 2)
     cv2.imwrite(f"{out_dir}/joint_overlay.png", joint_overlay)
 
     # convert texture to RGBA and save
     img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
     cv2.imwrite(f"{out_dir}/texture.png", img)
+
+    return output
