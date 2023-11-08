@@ -54,10 +54,10 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         motion_cfg_fn = sys.argv[2]
     else:
-        motion_cfg_fn = resource_filename(__name__, 'config/motion/wave_hello.yaml')
+        motion_cfg_fn = resource_filename(__name__, 'config/motion/pili.yaml')
     if len(sys.argv) > 3:
         retarget_cfg_fn = sys.argv[3]
     else:
-        retarget_cfg_fn = resource_filename(__name__, 'config/retarget/fair1_ppf.yaml')
+        retarget_cfg_fn = resource_filename(__name__, 'config/retarget/cmu1_pfp_copy.yaml')
 
     annotations_to_animation(char_anno_dir, motion_cfg_fn, retarget_cfg_fn)

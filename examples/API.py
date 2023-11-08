@@ -104,4 +104,4 @@ async def motion(request: Request):
     return templates.TemplateResponse("motion.html", {"request": request})
 
 if __name__ == '__main__':
-    uvicorn.run( app="main:app", host="0.0.0.0", port=8886)
+    uvicorn.run( app="api:app", host="0.0.0.0", port=8886, reload=True)
