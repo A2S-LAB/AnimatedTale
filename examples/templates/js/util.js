@@ -2,6 +2,11 @@ let mouse_state = 0     // 0 : mouse up , 1 : mouse down
 let mouse_coor = {x:0, y:0}
 let select_circle = -1
 
+let joints = []
+let contours = []
+let width_rate = 1
+let height_rate = 1
+
 const get_skeleton = () => {
     var form = new FormData();
     form.append( "file", $("#fileInput")[0].files[0] );
@@ -12,7 +17,6 @@ const get_skeleton = () => {
         processData : false,
         contentType : false,
         success:function(result){
-            console.log(result);
 
             const image = $("#uploadedImage")
             const svg = $("#svg")
@@ -22,19 +26,21 @@ const get_skeleton = () => {
             svg.width(width + "px")
             svg.height(height + "px")
 
-            draw_coordinate(result)
+            draw_joint(result)
         }
     })
 }
 
-const draw_coordinate = (e) => {
+const draw_joint = (e) => {
     $('circle').remove()
-    coor = e.coordinate
+
     shape = e.shape
+    joints = e.joints
+    contours = e.contours
     width_rate = $("#uploadedImage").width() / shape[0]
     height_rate = $("#uploadedImage").height() / shape[1]
 
-    $.each(coor, function(idx, val){
+    $.each(joints, function(idx, val){
         info = {}
         info.id = idx
         info.x = val[0] * width_rate
@@ -45,6 +51,33 @@ const draw_coordinate = (e) => {
             select_circle = idx
         })
     })
+}
+
+const draw_contours = (e) => {
+    info = {}
+    info.id = "polygon"
+
+    let cal_contours = []
+    $.each(contours, function(idx, val){
+        cor = val[0]
+        cal_contours.push([[cor[0] * width_rate, cor[1] * height_rate]])
+    })
+    info.points = cal_contours
+
+    drawPolygon(info)
+}
+
+const drawPolygon = (info) => {
+    let tagString =
+        `<polygon
+            id='${info.id}'
+            points='${info.points}'
+            style='
+                stroke:#ff1105;
+                fill:#ff0000;
+                fill-opacity:0.6';
+        />`
+    document.getElementById('svg').appendChild(parseSVG(tagString))
 }
 
 const draw_circle = (info) => {
