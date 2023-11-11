@@ -44,7 +44,8 @@ async def upload_page(request: Request):
     return templates.TemplateResponse("upload.html", {"request": request, "video": None})
 
 class upload_result(BaseModel):
-    coordinate : List[int]
+    joints : List[int]
+    contours : List[int]
     shape : List[int]
 
 @app.post("/process_skeleton", response_model=None)
@@ -55,11 +56,15 @@ async def process_upload(file: UploadFile = File(...)) -> upload_result:
     img = np.frombuffer(img, dtype=np.uint8)
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
 
-    predict_result = predict_joint(img, target_dir + file.filename, target_dir)
+    joints = predict_joint(img, target_dir + file.filename, target_dir)
+    contours = await predict_mask(sam, img, joints)
 
+    print(joints)
+    print(contours)
     return {
         "shape": img.shape[:2][::-1],
-        "coordinate": predict_result
+        "joints": joints,
+        "contours": contours
     }
 
 
@@ -137,4 +142,4 @@ async def motion(request: Request):
     return templates.TemplateResponse("motion.html", {"request": request})
 
 if __name__ == '__main__':
-    uvicorn.run( app="main:app", host="0.0.0.0", port=8887, reload=True)
+    uvicorn.run( app="main:app", host="localhost", port=8887, reload=True)

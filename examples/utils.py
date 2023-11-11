@@ -177,7 +177,7 @@ def mask(path):
     cv2.destroyAllWindows()
     cv2.imwrite(path + '/mask.png', mask_copy)
 
-async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray) -> np.ndarray:
+async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray, joint:np.ndarray) -> np.ndarray:
 
     # ensure it's rgb
     if len(img.shape) != 3:
@@ -191,7 +191,7 @@ async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray) -> np.ndarray:
         img = cv2.resize(img, (round(scale * img.shape[1]), round(scale * img.shape[0])))
 
     #bbox(ndarray)
-    bbox = auto_bbox(img)
+    # bbox = auto_bbox(img)
 
     #Pre-process
     sam.to(device=device)
@@ -201,21 +201,33 @@ async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray) -> np.ndarray:
 
     #Predict mask as SAM
     masks, _, _ = predictor.predict(
-        point_coords=None,
-        point_labels=None,
-        box=bbox[None, :],
+        point_coords=np.array(joint),
+        point_labels=np.ones(len(joint)),
+        box=None,
+        # box=bbox[None, :],
         multimask_output=False,
     )
 
     #Post-process
-    masks = masks.astype('uint8')
+    masks = masks.astype(np.uint8)
     masks = masks.reshape(masks.shape[-2], masks.shape[-1], 1)
-    masks = masks * 255
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
-    masks = cv2.morphologyEx(masks, cv2.MORPH_CLOSE, kernel, iterations=2)
+    contours = cv2.findContours(masks, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-    return masks
+    # for i in contours[0]:
+    #     for j in i:
+    #         cv2.circle(masks, (j[0][0],j[0][1]), 1, (255,0,0), -1)
+    # cv2.imwrite('2.png', masks)
+
+    # masks = masks.astype('uint8')
+    # masks = masks * 255
+    # print(contours)
+    # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
+    # masks = cv2.morphologyEx(masks, cv2.MORPH_CLOSE, kernel, iterations=2)
+    # ret, imthres = cv2.threshold(masks, 127, 255, cv2.THRESH_BINARY_INV)
+    # contours = cv2.findContours(masks, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+    return contours[0][0].tolist()
 
 def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
     #Loading image
