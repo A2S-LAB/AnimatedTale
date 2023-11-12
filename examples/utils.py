@@ -214,18 +214,18 @@ async def predict_mask(sam: modeling.sam.Sam, img:UploadFile) -> np.ndarray:
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
     masks = cv2.morphologyEx(masks, cv2.MORPH_CLOSE, kernel, iterations=2)
-
+    cv2.imwrite("web_test/mask.png", masks)
     return masks
 
 def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
     #Loading image
     # img = cv2.imread(img_path)
-
+    
     # ensure it's rgb
-    # if len(img.shape) != 3:
-    #     msg = f'image must have 3 channels (rgb). Found {len(img.shape)}'
-    #     logging.critical(msg)
-    #     assert False, msg
+    if len(img.shape) != 3:
+        msg = f'image must have 3 channels (rgb). Found {len(img.shape)}'
+        logging.critical(msg)
+        assert False, msg
 
     # resize if needed
     if np.max(img.shape) > 1000:
@@ -281,20 +281,20 @@ def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
     output = []
     output.append((kpts[11]+kpts[12])/2)
     output.append((kpts[11]+kpts[12])/2)
-    outupt.append((kpts[5]+kpts[6])/2)
-    outupt.append(kpts[0])
-    outupt.append(kpts[6])
-    outupt.append(kpts[8])
-    outupt.append(kpts[10])
-    outupt.append(kpts[5])
-    outupt.append(kpts[7])
-    outupt.append(kpts[9])
-    outupt.append(kpts[12])
-    outupt.append(kpts[14])
-    outupt.append(kpts[16])
-    outupt.append(kpts[11])
-    outupt.append(kpts[13])
-    outupt.append(kpts[15])
+    output.append((kpts[5]+kpts[6])/2)
+    output.append(kpts[0])
+    output.append(kpts[6])
+    output.append(kpts[8])
+    output.append(kpts[10])
+    output.append(kpts[5])
+    output.append(kpts[7])
+    output.append(kpts[9])
+    output.append(kpts[12])
+    output.append(kpts[14])
+    output.append(kpts[16])
+    output.append(kpts[11])
+    output.append(kpts[13])
+    output.append(kpts[15])
 
     # create the character config dictionary
     char_cfg = {'skeleton': skeleton, 'height': img.shape[0], 'width': img.shape[1]}
@@ -303,6 +303,7 @@ def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
     with open(f"{out_dir}/char_cfg.yaml", 'w') as f:
         yaml.dump(char_cfg, f)
 
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
     # create joint viz overlay for inspection purposes
     joint_overlay = img.copy()
     for idx,joint in enumerate(skeleton):
@@ -313,7 +314,6 @@ def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
     cv2.imwrite(f"{out_dir}/joint_overlay.png", joint_overlay)
 
     # convert texture to RGBA and save
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
     cv2.imwrite(f"{out_dir}/texture.png", img)
 
     return output

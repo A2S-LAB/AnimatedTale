@@ -11,6 +11,7 @@ from pydantic import BaseModel
 import shutil
 from pathlib import Path
 import logging
+import aiofiles
 
 from annotations_to_animation import annotations_to_animation
 from utils import auto_bbox, predict_mask, predict_joint
@@ -33,6 +34,14 @@ templates = Jinja2Templates(directory="templates")
 def get_image(image_path: str):
     return FileResponse(image_path)
 
+@app.post("/save_image/{image_path:path}")
+async def save_image(image_path: str, file: UploadFile = File(...)):
+        file_location = f"{image_path}"
+        async with aiofiles.open(file_location, 'wb') as out_file:
+            content = await file.read()
+            await out_file.write(content)
+        return {"info": "File saved"}
+
 @app.get("/")
 def main_page(request: Request, video: str = ""):
     return templates.TemplateResponse("index.html", {"request": request, "video": video})
@@ -52,7 +61,7 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
     img = np.frombuffer(img, dtype=np.uint8)
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
 
-    # mask = await predict_mask(sam, img)
+    mask = await predict_mask(sam, img)
     predict_joint(img, target_dir + file.filename, target_dir)
 
     return templates.TemplateResponse("mask.html", {"request": request})
@@ -69,14 +78,17 @@ async def joint_overlay(request: Request):
 async def make_gif(gif_name: str = Form(...)):
     target_dir = "web_test/"
     motion_cfg_fn = f'config/motion/{gif_name}.yaml'
-    if gif_name == 'hi' or gif_name == 'hurray' or gif_name =='jelly':
+    if gif_name == 'hi' or gif_name == 'hurray' or gif_name =='jelly' or gif_name =='lala':
         retarget_file = 'cmu1_pfp_copy'
-    elif gif_name == 'jesse_dance':
+    elif gif_name == 'jesse_dance' or gif_name =='jazz':
         retarget_file = 'mixamo_fff'
     elif gif_name == 'jumping_jacks':
         retarget_file = 'cmu1_pfp'
+    elif gif_name == 'sun' or gif_name == 'waltz_f':
+        retarget_file = 'git'
     else:
         retarget_file = 'fair1_ppf'
+    
     retarget_cfg_fn = f'config/retarget/{retarget_file}.yaml'
     annotations_to_animation(target_dir, motion_cfg_fn, retarget_cfg_fn)
     return RedirectResponse(url="/confirm", status_code=status.HTTP_303_SEE_OTHER)

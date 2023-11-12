@@ -130,7 +130,7 @@ def image_to_annotations(img_fn: str, out_dir: str) -> None:
 
 def segment1(img: np.ndarray):
     # image = cv2.imread(img)
-    # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     bbox = auto_bbox(img)
 
