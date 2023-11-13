@@ -7,17 +7,20 @@ let contours = []
 let width_rate = 1
 let height_rate = 1
 
+let mode = "joint" //segment
+
 const get_skeleton = () => {
     var form = new FormData();
-    form.append( "file", $("#fileInput")[0].files[0] );
+    return_val = false
+    form.append( "file", $("#fileInput")[0].files[0]);
     $.ajax({
         type:"POST",
         url:"/process_skeleton",
         data:form,
         processData : false,
         contentType : false,
+        async : false,
         success:function(result){
-
             const image = $("#uploadedImage")
             const svg = $("#svg")
             const width = image.width()
@@ -41,10 +44,12 @@ const draw_joint = (e) => {
     height_rate = $("#uploadedImage").height() / shape[1]
 
     $.each(joints, function(idx, val){
+        if(idx == 0) return true
         info = {}
         info.id = idx
         info.x = val[0] * width_rate
         info.y = val[1] * height_rate
+        info.fill = "#ff0000"
 
         draw_circle(info)
         document.getElementById(`${idx}`).addEventListener('mousedown', function(){
@@ -86,7 +91,7 @@ const draw_circle = (info) => {
             id='${info.id}'
             cx='${info.x}'
             cy='${info.y}'
-            fill='#ff0000'
+            fill='${info.fill}'
             r='6'
         />`
     document.getElementById('svg').appendChild(parseSVG(tagString))

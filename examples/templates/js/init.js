@@ -9,6 +9,8 @@ window.addEventListener(`resize`, function() {
     }
 });
 
+document.oncontextmenu = function(){return false}
+
 window.addEventListener('mousemove', function(e){
     if(mouse_state == 1 && select_circle != -1){
         X = e.layerX
@@ -19,13 +21,29 @@ window.addEventListener('mousemove', function(e){
     }
 })
 
-window.addEventListener('mousedown', function(e){
-    if(e.target.classList[0] == undefined){
-        mouse_state = 1
-    }
-    if(e.target.classList[0] == "canvas"){
-        mouse_state = 0
-        // select_circle = -1
+window.addEventListener('mousedown', (e) => {
+    if(mode == "joint"){
+        if(e.target.classList[0] == undefined){
+            mouse_state = 1
+        }
+        if(e.target.classList[0] == "canvas"){
+            mouse_state = 0
+        }
+    }else if(mode == "segment"){
+        if(e.which == 1){
+            // left click
+            info = {}
+            info.x = e.layerX
+            info.y = e.layerY
+            info.fill = "#ff0000"
+        }else if(e.which == 3){
+            // right click
+            info = {}
+            info.x = e.layerX
+            info.y = e.layerY
+            info.fill = "#0000ff"
+        }
+        draw_circle(info)
     }
 })
 

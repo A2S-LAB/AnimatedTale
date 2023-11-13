@@ -23,10 +23,9 @@
         </div>
         <div class="button-container">
             <input class="file" type="file" name="file" id="fileInput" />
-            <label for="fileInput" class="btn-common btn-upload">Upload</label>
+            <label for="fileInput" class="btn-common btn-upload">사진 선택</label>
             <input class="file" name="" id="submitInput" />
-            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="btn_submit(this)" style="display:none" value="0">Submit</label>
-            <!-- <button class="btn-common btn-submit" style="display:none" id="submitButton" onclick="get_skeleton()">사진 전송</button> -->
+            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="btn_submit(this)" style="display:none" value="0">사진 전송</label>
         </div>
     </div>
     <div id="submittedMessage" class="submitted-popup">
@@ -104,7 +103,7 @@
             }
         }
 
-        const btn_submit = (e) => {
+        const btn_submit = async (e) => {
             btn_type = $(e).attr("value")
 
             switch(btn_type){
@@ -113,9 +112,23 @@
                     $(e).attr("value", "1")
                     break
                 case "1":
-                    console.log("1")
+                    save_skeleton()
+                    draw_contours()
+                    $(e).attr("value", "2")
+                    break
+                case "2":
+                    $(e).attr("value", "2")
                     break
             }
+        }
+
+        const save_skeleton = () => {
+            joints = []
+            $.each($("circle"), function(idx, val){
+                const target = $($("circle")[idx])
+                joints.push([target.attr("cx") / width_rate, target.attr("cy") / height_rate])
+            })
+            $("circle").remove()
         }
 
     </script>
