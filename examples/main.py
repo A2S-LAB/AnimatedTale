@@ -59,8 +59,6 @@ async def process_upload(file: UploadFile = File(...)) -> upload_result:
     joints = predict_joint(img, target_dir + file.filename, target_dir)
     contours = await predict_mask(sam, img, joints)
 
-    print(joints)
-    print(contours)
     return {
         "shape": img.shape[:2][::-1],
         "joints": joints,

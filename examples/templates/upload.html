@@ -8,6 +8,7 @@
     <title>Animated Tale</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <script src="/js/util.js"></script>
+    <script src="/js/init.js"></script>
 </head>
 <body>
     <h1 class="title">Animated Tale</h1>
@@ -24,7 +25,7 @@
             <input class="file" type="file" name="file" id="fileInput" />
             <label for="fileInput" class="btn-common btn-upload">Upload</label>
             <input class="file" name="" id="submitInput" />
-            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="get_skeleton()" style="display:none">Submit</label>
+            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="btn_submit(this)" style="display:none" value="0">Submit</label>
             <!-- <button class="btn-common btn-submit" style="display:none" id="submitButton" onclick="get_skeleton()">사진 전송</button> -->
         </div>
     </div>
@@ -103,41 +104,19 @@
             }
         }
 
-        window.addEventListener(`resize`, function() {
-            const width = canvas.offsetWidth
-            const height = canvas.offsetHeight
-            const padding = 60
-            if (imgElement.width > imgElement.height){
-                imgElement.style.width = (width - padding)+ "px";
-            }else{
-                imgElement.style.height = (height - padding)+ "px";
-            }
-        });
+        const btn_submit = (e) => {
+            btn_type = $(e).attr("value")
 
-        window.addEventListener('mousemove', function(e){
-            if(mouse_state == 1 && select_circle != -1){
-                X = e.layerX
-                Y = e.layerY
-
-                $(`#${select_circle}`).css("cx", X)
-                $(`#${select_circle}`).css("cy", Y)
+            switch(btn_type){
+                case "0":
+                    get_skeleton()
+                    $(e).attr("value", "1")
+                    break
+                case "1":
+                    console.log("1")
+                    break
             }
-        })
-
-        window.addEventListener('mousedown', function(e){
-            if(e.target.classList[0] == undefined){
-                mouse_state = 1
-            }
-            if(e.target.classList[0] == "canvas"){
-                mouse_state = 0
-                // select_circle = -1
-            }
-        })
-
-        window.addEventListener('mouseup', function(e){
-            mouse_state = 0
-            select_circle = -1
-        })
+        }
 
     </script>
 </body>
