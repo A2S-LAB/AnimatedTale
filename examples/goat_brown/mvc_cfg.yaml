@@ -1,0 +1,10 @@
+controller:
+  MODE: video_render
+  OUTPUT_VIDEO_PATH: /home/dcvlab/dcv/Coco/AnimatedTale/examples/goat_brown/video.gif
+scene:
+  ANIMATED_CHARACTERS:
+  - character_cfg: /home/dcvlab/dcv/Coco/AnimatedTale/examples/goat_brown/char_cfg.yaml
+    motion_cfg: /home/dcvlab/dcv/Coco/AnimatedTale/examples/config/motion/walking_250.yaml
+    retarget_cfg: /home/dcvlab/dcv/Coco/AnimatedTale/examples/config/retarget/four_legs_mixamo.yaml
+view:
+  USE_MESA: true
