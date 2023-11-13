@@ -6,6 +6,7 @@ from typing import List
 import os
 import cv2
 import uvicorn
+import json
 
 import numpy as np
 from pydantic import BaseModel
@@ -45,11 +46,16 @@ async def upload_page(request: Request):
 
 class upload_result(BaseModel):
     joints : List[int]
-    contours : List[int]
+    contours : List[float]
     shape : List[int]
+
+class predict_sam(BaseModel):
+    image : str
+    joints : List[int]
 
 @app.post("/process_skeleton", response_model=None)
 async def process_upload(file: UploadFile = File(...)) -> upload_result:
+    print(f"[INFO] Process skeleton")
     target_dir = "web_test/"
 
     img = await file.read()
@@ -65,6 +71,20 @@ async def process_upload(file: UploadFile = File(...)) -> upload_result:
         "contours": contours
     }
 
+@app.post("/process_sam", response_model=None)
+async def process_sam(file: UploadFile = File(...), joints: str = Form(...)) -> upload_result:
+    img = await file.read()
+    img = np.frombuffer(img, dtype=np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
+
+    joint = np.array(json.loads(joints)["joints"])
+    contours = await predict_mask(sam, img, joint)
+
+    return {
+        "shape": img.shape[:2][::-1],
+        "joints": None,
+        "contours": contours
+    }
 
 @app.post("/process_upload")
 async def process_upload(request: Request, file: UploadFile = File(...)):

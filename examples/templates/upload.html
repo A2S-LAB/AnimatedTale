@@ -115,8 +115,10 @@
                     save_skeleton()
                     draw_contours()
                     $(e).attr("value", "2")
+                    mode = "segment"
                     break
                 case "2":
+                    predict_sam()
                     $(e).attr("value", "2")
                     break
             }

@@ -11,8 +11,7 @@ let mode = "joint" //segment
 
 const get_skeleton = () => {
     var form = new FormData();
-    return_val = false
-    form.append( "file", $("#fileInput")[0].files[0]);
+    form.append("file", $("#fileInput")[0].files[0]);
     $.ajax({
         type:"POST",
         url:"/process_skeleton",
@@ -30,6 +29,30 @@ const get_skeleton = () => {
             svg.height(height + "px")
 
             draw_joint(result)
+            contours = result.contours
+        }
+    })
+}
+
+const predict_sam = () => {
+    var form = new FormData();
+    let req_joints = {
+        "joints" : joints
+    }
+    form.append("file", $("#fileInput")[0].files[0])
+    form.append("joints", JSON.stringify(req_joints))
+
+    $.ajax({
+        type:"POST",
+        url:"/process_sam",
+        data:form,
+        dataType:"json",
+        processData : false,
+        contentType : false,
+        async : false,
+        success:function(result){
+            contours = result.contours
+            draw_contours()
         }
     })
 }
@@ -39,7 +62,6 @@ const draw_joint = (e) => {
 
     shape = e.shape
     joints = e.joints
-    contours = e.contours
     width_rate = $("#uploadedImage").width() / shape[0]
     height_rate = $("#uploadedImage").height() / shape[1]
 
@@ -59,6 +81,7 @@ const draw_joint = (e) => {
 }
 
 const draw_contours = (e) => {
+    $("polygon").remove()
     info = {}
     info.id = "polygon"
 
@@ -95,10 +118,6 @@ const draw_circle = (info) => {
             r='6'
         />`
     document.getElementById('svg').appendChild(parseSVG(tagString))
-}
-
-const move_circle = (info) => {
-    select_circle = info
 }
 
 const parseSVG = (s) => {
