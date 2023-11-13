@@ -43,9 +43,14 @@
 
         form {
             position: absolute;
+            bottom: 1vh; /* Adjusted for better spacing from the bottom */
+            right: 1vw;
             background-color: transparent;
+            border: none;
+            box-shadow: none;
             display: flex;
             flex-direction: row;
+            gap: 1vw;
         }
 
         .canvas {
@@ -55,7 +60,17 @@
             background-color: white;
             border: 0.1vw solid #ccc;
             box-shadow: 0 0.4vw 0.8vw rgba(0, 0, 0, 0.1);
+            padding: 2vh;
+            text-align: center;
             border-radius: 1.5vw;
+        }
+
+        img {
+            height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .btn-prev {
@@ -190,6 +205,16 @@
             100% { transform: rotate(360deg); }
         }
 
+        #Mask {
+            max-height: 100%;
+            display: block;
+            margin: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
     </style>
     
 </head>
@@ -197,12 +222,12 @@
     <h1 class="title">Animated Tale</h1>
     <div class="canvas-container">
         <div class="canvas">
-            <canvas id="displayCanvas" style="position: absolute; z-index: 1;"></canvas>
-            <canvas id="maskCanvas" style="position: absolute; z-index: 2;"></canvas>
+            <img id="Mask" src="/get_image/web_test/mask.png" alt="Mask">
         </div>
         <a href="/upload" class="btn-prev">Prev</a>
-        <a href="javascript:saveAndGoToNext();" class="btn-next">Next</a>
+        <a href="/joint_overlay" class="btn-next">Next</a>
     </div>
+
     <svg class="balloon" style="left: 5%; width: 60px; animation-delay: 1s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
     <svg class="balloon" style="right: 10%; width: 80px; animation-delay: 3s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
     <svg class="balloon" style="left: 15%; width: 50px; animation-delay: 2s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
@@ -224,142 +249,11 @@
     <div class="doodle squiggle" style="top: 65%; right: 20%;"></div>
 
     <script>
-        let canvas;
-        let ctx;
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
-        let brushSize = 4;
-        let brushColor = '#000000'; 
-        let displayCanvas, maskCanvas;
-        let displayCtx, maskCtx;
 
-        function initCanvas() {
-            maskCanvas = document.getElementById('maskCanvas');
-            maskCtx = maskCanvas.getContext('2d');
-
-            const originalImage = new Image();
-            const maskImage = new Image();
-
-            maskImage.onload = function() {
-                maskCanvas.width = maskImage.naturalWidth;
-                maskCanvas.height = maskImage.naturalHeight;
-                maskCtx.drawImage(maskImage, 0, 0); // Draw the original mask on maskCanvas
-
-                originalImage.onload = function() {
-                    maskCtx.globalAlpha = 0.3; // Set transparency for the original image
-                    maskCtx.drawImage(originalImage, 0, 0);
-                    maskCtx.globalAlpha = 1.0; // Reset the alpha
-                };
-                originalImage.src = 'get_image/web_test/texture.png'; // Path to the original image
-            };
-
-            maskImage.src = 'get_image/web_test/mask.png'; // Path to the original mask
-
-            // Event listeners for maskCanvas only
-            maskCanvas.addEventListener('mousedown', startDrawing);
-            maskCanvas.addEventListener('mousemove', draw);
-            maskCanvas.addEventListener('mouseup', stopDrawing);
-            maskCanvas.addEventListener('mouseout', stopDrawing);
-            maskCanvas.addEventListener('wheel', changeBrushSize);
-            maskCanvas.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-            });
-
-            document.addEventListener('keydown', changeBrushColor);
-        }
-
-
-        function processToBinary(canvasContext, width, height) {
-            let imageData = canvasContext.getImageData(0, 0, width, height);
-            let data = imageData.data;
-
-            for (let i = 0; i < data.length; i += 4) {
-                let value = data[i] > 128 ? 255 : 0;
-                data[i] = data[i + 1] = data[i + 2] = value;
-                data[i + 3] = 255;
-            }
-
-            canvasContext.putImageData(imageData, 0, 0);
-        }
-
-        function startDrawing(e) {
-            e.preventDefault(); 
-            isDrawing = true;
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-            brushColor = (e.button === 2) ? '#FFFFFF' : '#000000';
-        }
-
-        function draw(e) {
-            if (!isDrawing) return;
-
-            maskCtx.globalAlpha = 0.5; 
-            maskCtx.beginPath();
-            maskCtx.arc(e.offsetX, e.offsetY, brushSize, 0, Math.PI * 2, false);
-            maskCtx.fillStyle = brushColor;
-            maskCtx.fill();
-            maskCtx.closePath();
-            maskCtx.globalAlpha = 1.0; 
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        window.onload = initCanvas;
-
-        function changeBrushSize(e) {
-            brushSize += e.deltaY * -0.01;
-            brushSize = Math.min(Math.max(1, brushSize), 100);
-        }
-
-        canvas.addEventListener('wheel', changeBrushSize);
-
-        function changeBrushColor(e) {
-            if (e.key === 'c') { 
-                brushColor = brushColor === '#000000' ? '#FFFFFF' : '#000000'; 
-            }
-        }
-
-        document.addEventListener('keydown', changeBrushColor);
-
-        function saveAndGoToNext() {
-            let tempCanvas = document.createElement('canvas');
-            let tempCtx = tempCanvas.getContext('2d');
-            tempCanvas.width = maskCanvas.width;
-            tempCanvas.height = maskCanvas.height;
-
-            tempCtx.drawImage(maskCanvas, 0, 0);
-
-            processToBinary(tempCtx, tempCanvas.width, tempCanvas.height);
-
-            tempCanvas.toBlob(function(blob) {
-                var formData = new FormData();
-                formData.append('file', blob, 'mask.png');
-                
-                fetch('/save_image/web_test/mask.png', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    console.log('Response received');
-                    if (response.ok) {
-                        console.log('Response OK, navigating to /joint_overlay');
-                        window.location.href = "/joint_overlay";
-                    } else {
-                        console.log('Response not OK', response);
-                        throw new Error('Network response was not ok.');
-                    }
-                })
-                .catch((error) => {
-                    console.error('Fetch error:', error);
-                });
-            });
-        }
-
-        window.onload = initCanvas;
     </script>
+    
 </body>
+
 </html>
 
 
