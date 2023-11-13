@@ -18,7 +18,7 @@ To be downloaded here: https://drive.google.com/drive/folders/1OEPVllbxKPWi5z22P
 ### segment-anything model
 - sam vit-l model
 ```bash
-curl https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth --output ./examples/sam_vit_h_4b8939.pth
+curl https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth --output ./examples/sam_vit_l_0b3195.pth
 ```
 
 ## Start project

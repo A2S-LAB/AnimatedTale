@@ -2,9 +2,11 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi import FastAPI, UploadFile, File, Request, status, Form
 from fastapi.staticfiles import StaticFiles
+from typing import List
 import os
 import cv2
 import uvicorn
+import json
 
 import numpy as np
 from pydantic import BaseModel
@@ -26,6 +28,7 @@ sam = sam_model_registry["vit_l"](checkpoint="sam_vit_l_0b3195.pth")
 app = FastAPI()
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 app.mount("/css", StaticFiles(directory="templates/css/"), name="static")
+app.mount("/js", StaticFiles(directory="templates/js/"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -40,6 +43,48 @@ def main_page(request: Request, video: str = ""):
 @app.get("/upload")
 async def upload_page(request: Request):
     return templates.TemplateResponse("upload.html", {"request": request, "video": None})
+
+class upload_result(BaseModel):
+    joints : List[int]
+    contours : List[float]
+    shape : List[int]
+
+class predict_sam(BaseModel):
+    image : str
+    joints : List[int]
+
+@app.post("/process_skeleton", response_model=None)
+async def process_upload(file: UploadFile = File(...)) -> upload_result:
+    print(f"[INFO] Process skeleton")
+    target_dir = "web_test/"
+
+    img = await file.read()
+    img = np.frombuffer(img, dtype=np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
+
+    joints = predict_joint(img, target_dir + file.filename, target_dir)
+    contours = await predict_mask(sam, img, joints)
+
+    return {
+        "shape": img.shape[:2][::-1],
+        "joints": joints,
+        "contours": contours
+    }
+
+@app.post("/process_sam", response_model=None)
+async def process_sam(file: UploadFile = File(...), joints: str = Form(...)) -> upload_result:
+    img = await file.read()
+    img = np.frombuffer(img, dtype=np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
+
+    joint = np.array(json.loads(joints)["joints"])
+    contours = await predict_mask(sam, img, joint)
+
+    return {
+        "shape": img.shape[:2][::-1],
+        "joints": None,
+        "contours": contours
+    }
 
 @app.post("/process_upload")
 async def process_upload(request: Request, file: UploadFile = File(...)):
@@ -115,4 +160,4 @@ async def motion(request: Request):
     return templates.TemplateResponse("motion.html", {"request": request})
 
 if __name__ == '__main__':
-    uvicorn.run( app="main:app", host="0.0.0.0", port=8886, reload=True)
+    uvicorn.run( app="main:app", host="localhost", port=8887, reload=True)
