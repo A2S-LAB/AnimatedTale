@@ -177,7 +177,12 @@ def mask(path):
     cv2.destroyAllWindows()
     cv2.imwrite(path + '/mask.png', mask_copy)
 
-async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray, joint:np.ndarray) -> np.ndarray:
+async def predict_mask(
+        sam: modeling.sam.Sam,
+        img:np.ndarray,
+        joint:np.ndarray,
+        label:np.ndarray = []
+    ) -> np.ndarray:
 
     # ensure it's rgb
     if len(img.shape) != 3:
@@ -193,13 +198,23 @@ async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray, joint:np.ndarray) 
     #Pre-process
     sam.to(device=device)
 
+    test_image = img.copy()
+
     predictor = SamPredictor(sam)
     predictor.set_image(img)
+
+    point_labels = np.ones(16, dtype=np.int8)
+    if len(label) != 0:
+        point_labels = np.append(point_labels, label)
+
+    print(f"label length : {len(point_labels)}")
+    print(f"joint length : {len(joint)}")
+    print(f"[INFO] image shape : {np.array(img).shape}")
 
     #Predict mask as SAM
     masks, _, _ = predictor.predict(
         point_coords=np.array(joint),
-        point_labels=np.ones(len(joint)),
+        point_labels=point_labels,
         box=None,
         # box=bbox[None, :],
         multimask_output=False,
@@ -209,9 +224,15 @@ async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray, joint:np.ndarray) 
     masks = masks.astype(np.uint8)
     masks = masks.reshape(masks.shape[-2], masks.shape[-1], 1)
 
+    cv2.imwrite('mask.png', masks * 255)
+
     contours = cv2.findContours(masks, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-    return contours[0][0].tolist()
+    max_len = 0
+    for idx, val in enumerate(contours[0]):
+        if len(val) > max_len: max_len = idx
+
+    return contours[0][max_len].tolist()
 
 def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
     # resize if needed
@@ -289,15 +310,6 @@ def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
     # dump character config to yaml
     with open(f"{out_dir}/char_cfg.yaml", 'w') as f:
         yaml.dump(char_cfg, f)
-
-    # create joint viz overlay for inspection purposes
-    joint_overlay = img.copy()
-    for idx,joint in enumerate(skeleton):
-        x, y = joint['loc']
-        name = joint['name']
-        cv2.circle(joint_overlay, (int(x), int(y)), 5, (0, 0, 0), 5)
-        cv2.putText(joint_overlay, str(idx), (int(x), int(y+15)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, 2)
-    cv2.imwrite(f"{out_dir}/joint_overlay.png", joint_overlay)
 
     # convert texture to RGBA and save
     img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)

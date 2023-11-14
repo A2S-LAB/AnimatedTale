@@ -118,7 +118,6 @@
                     mode = "segment"
                     break
                 case "2":
-                    predict_sam()
                     $(e).attr("value", "2")
                     break
             }
@@ -128,6 +127,9 @@
             joints = []
             $.each($("circle"), function(idx, val){
                 const target = $($("circle")[idx])
+                if(idx == 0){
+                    joints.push([target.attr("cx") / width_rate, target.attr("cy") / height_rate])
+                }
                 joints.push([target.attr("cx") / width_rate, target.attr("cy") / height_rate])
             })
             $("circle").remove()

@@ -3,6 +3,7 @@ let mouse_coor = {x:0, y:0}
 let select_circle = -1
 
 let joints = []
+let joint_label = []
 let contours = []
 let width_rate = 1
 let height_rate = 1
@@ -18,7 +19,6 @@ const get_skeleton = () => {
         data:form,
         processData : false,
         contentType : false,
-        async : false,
         success:function(result){
             const image = $("#uploadedImage")
             const svg = $("#svg")
@@ -36,11 +36,15 @@ const get_skeleton = () => {
 
 const predict_sam = () => {
     var form = new FormData();
-    let req_joints = {
+    const req_joints = {
         "joints" : joints
+    }
+    const req_labels = {
+        "labels" : joint_label
     }
     form.append("file", $("#fileInput")[0].files[0])
     form.append("joints", JSON.stringify(req_joints))
+    form.append("labels", JSON.stringify(req_labels))
 
     $.ajax({
         type:"POST",
@@ -49,9 +53,9 @@ const predict_sam = () => {
         dataType:"json",
         processData : false,
         contentType : false,
-        async : false,
         success:function(result){
             contours = result.contours
+            console.log(contours)
             draw_contours()
         }
     })
@@ -102,8 +106,8 @@ const drawPolygon = (info) => {
             points='${info.points}'
             style='
                 stroke:#ff1105;
-                fill:#ff0000;
-                fill-opacity:0.6';
+                fill:#FFE4C4;
+                fill-opacity:0.5';
         />`
     document.getElementById('svg').appendChild(parseSVG(tagString))
 }

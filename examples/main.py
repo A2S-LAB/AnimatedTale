@@ -72,13 +72,20 @@ async def process_upload(file: UploadFile = File(...)) -> upload_result:
     }
 
 @app.post("/process_sam", response_model=None)
-async def process_sam(file: UploadFile = File(...), joints: str = Form(...)) -> upload_result:
+async def process_sam(
+    file: UploadFile = File(...),
+    joints: str = Form(...),
+    labels: str = Form(...)
+) -> upload_result:
+    print(f"[INFO] Process skeleton")
+
     img = await file.read()
     img = np.frombuffer(img, dtype=np.uint8)
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
 
-    joint = np.array(json.loads(joints)["joints"])
-    contours = await predict_mask(sam, img, joint)
+    joints = np.array(json.loads(joints)["joints"])
+    labels = np.array(json.loads(labels)["labels"])
+    contours = await predict_mask(sam, img, joints, labels)
 
     return {
         "shape": img.shape[:2][::-1],
