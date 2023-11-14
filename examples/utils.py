@@ -190,9 +190,6 @@ async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray, joint:np.ndarray) 
         scale = 1000 / np.max(img.shape)
         img = cv2.resize(img, (round(scale * img.shape[1]), round(scale * img.shape[0])))
 
-    #bbox(ndarray)
-    # bbox = auto_bbox(img)
-
     #Pre-process
     sam.to(device=device)
 
@@ -214,31 +211,9 @@ async def predict_mask(sam: modeling.sam.Sam, img:np.ndarray, joint:np.ndarray) 
 
     contours = cv2.findContours(masks, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-    # for i in contours[0]:
-    #     for j in i:
-    #         cv2.circle(masks, (j[0][0],j[0][1]), 1, (255,0,0), -1)
-    # cv2.imwrite('2.png', masks)
-
-    # masks = masks.astype('uint8')
-    # masks = masks * 255
-    # print(contours)
-    # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
-    # masks = cv2.morphologyEx(masks, cv2.MORPH_CLOSE, kernel, iterations=2)
-    # ret, imthres = cv2.threshold(masks, 127, 255, cv2.THRESH_BINARY_INV)
-    # contours = cv2.findContours(masks, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
     return contours[0][0].tolist()
 
 def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
-    #Loading image
-    # img = cv2.imread(img_path)
-
-    # ensure it's rgb
-    # if len(img.shape) != 3:
-    #     msg = f'image must have 3 channels (rgb). Found {len(img.shape)}'
-    #     logging.critical(msg)
-    #     assert False, msg
-
     # resize if needed
     if np.max(img.shape) > 1000:
         scale = 1000 / np.max(img.shape)
