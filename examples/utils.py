@@ -304,6 +304,12 @@ def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
     output.append(list(kpts[13]))
     output.append(list(kpts[15]))
 
+    joint_text = ['root', 'hip', 'torso', 'neck', 'right_shourlder', 'right_elbow',
+                  'right_hand','left_shourlder', 'left_elbow', 'left_hand',
+                  'right_hip', 'right_knee', 'right_foot',
+                  'left_hip', 'left_knee', 'left_foot',
+                ]
+
     # create the character config dictionary
     char_cfg = {'skeleton': skeleton, 'height': img.shape[0], 'width': img.shape[1]}
 
@@ -315,4 +321,4 @@ def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
     img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
     cv2.imwrite(f"{out_dir}/texture.png", img)
 
-    return output
+    return output, joint_text

@@ -16,8 +16,8 @@ window.addEventListener('mousemove', function(e){
         X = e.layerX
         Y = e.layerY
 
-        $(`#${select_circle}`).css("cx", X)
-        $(`#${select_circle}`).css("cy", Y)
+        $(`#${select_circle}`).attr("cx", X)
+        $(`#${select_circle}`).attr("cy", Y)
     }
 })
 
@@ -30,7 +30,6 @@ window.addEventListener('mousedown', (e) => {
             mouse_state = 0
         }
     }else if(mode == "segment"){
-        console.log("mousedown")
         if(e.which == 1){
             // left click
             info = {}
@@ -60,4 +59,31 @@ window.addEventListener("keydown", function(e){
     if(e.key == "Enter"){
         predict_sam()
     }
+});
+
+// About motion
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to update the hidden input with the selected GIF name
+    function selectGif(gifElement) {
+        // Remove any existing selection styles
+        document.querySelectorAll('.gif-grid img').forEach(img => {
+            img.classList.remove('selected');
+        });
+
+        // Mark the clicked GIF as selected
+        gifElement.classList.add('selected');
+
+        // Extract the GIF name from the image source
+        const gifName = gifElement.getAttribute('data-name');
+
+        // Update the hidden input with the selected GIF name
+        document.getElementById('selectedGifName').value = gifName;
+    }
+
+    // Add click event listeners to each GIF
+    document.querySelectorAll('.gif-grid img').forEach(img => {
+        img.addEventListener('click', function() {
+            selectGif(this);
+        });
+    });
 });

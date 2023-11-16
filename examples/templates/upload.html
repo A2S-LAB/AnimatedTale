@@ -18,14 +18,30 @@
     </div>
     <div class="canvas-container">
         <div class="canvas">
-            <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
-            <svg class="svg" id="svg" style="display: none"></svg>
+            <div id="canvas-image">
+                <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
+                <svg class="svg" id="svg" style="display: none"></svg>
+            </div>
+            <div class="gif-grid" id="canvas-gif" style="display: none;">
+                <img src="/get_image/web_contents/motions/hi.gif" alt="GIF 1" data-name="hi">
+                <img src="/get_image/web_contents/motions/dab.gif" alt="GIF 2", data-name="dab">
+                <img src="/get_image/web_contents/motions/hurray.gif" alt="GIF 2", data-name="hurray">
+                <img src="/get_image/web_contents/motions/jelly.gif" alt="GIF 2", data-name="jelly">
+                <img src="/get_image/web_contents/motions/jesse_dance.gif" alt="GIF 2", data-name="jesse_dance">
+                <img src="/get_image/web_contents/motions/jumping_jacks.gif" alt="GIF 2", data-name="jumping_jacks">
+                <img src="/get_image/web_contents/motions/wave_hello.gif" alt="GIF 2", data-name="wave_hello">
+                <img src="/get_image/web_contents/motions/lala.gif" alt="GIF 2", data-name="lala">
+                <img src="/get_image/web_contents/motions/sun.gif" alt="GIF 2", data-name="sun">
+                <img src="/get_image/web_contents/motions/waltz_f.gif" alt="GIF 2", data-name="waltz_f">
+                <img src="/get_image/web_contents/motions/jazz.gif" alt="GIF 2", data-name="jazz">
+                <img src="/get_image/web_contents/motions/zombie.gif" alt="GIF 2", data-name="zombie">
+            </div>
         </div>
         <div class="button-container">
             <input class="file" type="file" name="file" id="fileInput" />
-            <label for="fileInput" class="btn-common btn-upload">사진 선택</label>
+            <label for="fileInput" class="btn-common btn-upload">Select</label>
             <input class="file" name="" id="submitInput" />
-            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="btn_submit(this)" style="display:none" value="0">사진 전송</label>
+            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="btn_submit(this)" style="display:none" value="0">Next</label>
         </div>
     </div>
     <div id="submittedMessage" class="submitted-popup">
@@ -110,6 +126,7 @@
                 case "0":
                     get_skeleton()
                     $(e).attr("value", "1")
+                    $(e).text("Next")
                     break
                 case "1":
                     save_skeleton()
@@ -118,6 +135,8 @@
                     mode = "segment"
                     break
                 case "2":
+                    $("#canvas-gif").css("display","grid")
+                    $("#canvas-image").css("display","none")
                     $(e).attr("value", "2")
                     break
             }

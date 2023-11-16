@@ -47,6 +47,7 @@ async def upload_page(request: Request):
 class upload_result(BaseModel):
     joints : List[int]
     contours : List[float]
+    joint_text : List[str]
     shape : List[int]
 
 class predict_sam(BaseModel):
@@ -62,12 +63,13 @@ async def process_upload(file: UploadFile = File(...)) -> upload_result:
     img = np.frombuffer(img, dtype=np.uint8)
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
 
-    joints = predict_joint(img, target_dir + file.filename, target_dir)
+    joints, joint_text = predict_joint(img, target_dir + file.filename, target_dir)
     contours = await predict_mask(sam, img, joints)
 
     return {
         "shape": img.shape[:2][::-1],
         "joints": joints,
+        "joint_text": joint_text,
         "contours": contours
     }
 
@@ -90,6 +92,7 @@ async def process_sam(
     return {
         "shape": img.shape[:2][::-1],
         "joints": None,
+        "joint_text" : None,
         "contours": contours
     }
 

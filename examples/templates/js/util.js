@@ -66,6 +66,7 @@ const draw_joint = (e) => {
 
     shape = e.shape
     joints = e.joints
+    joint_text = e.joint_text
     width_rate = $("#uploadedImage").width() / shape[0]
     height_rate = $("#uploadedImage").height() / shape[1]
 
@@ -84,6 +85,8 @@ const draw_joint = (e) => {
     })
 }
 
+
+
 const draw_contours = (e) => {
     $("polygon").remove()
     info = {}
@@ -97,6 +100,17 @@ const draw_contours = (e) => {
     info.points = cal_contours
 
     drawPolygon(info)
+}
+
+const draw_text = (e) => {
+    let tagString =
+        `<text
+            id='${info.id}'
+            x='${info.x}'
+            y='${info.y}'
+
+        >${info.text}</text>`
+        document.getElementById('svg').appendChild(parseSVG(tagString))
 }
 
 const drawPolygon = (info) => {
