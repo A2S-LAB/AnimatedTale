@@ -77,9 +77,11 @@ const draw_joint = (e) => {
         info.x = val[0] * width_rate
         info.y = val[1] * height_rate
         info.fill = "#ff0000"
+        info.text = joint_text[idx]
 
         draw_circle(info)
-        document.getElementById(`${idx}`).addEventListener('mousedown', function(){
+        draw_text(info)
+        document.getElementById(`c-${idx}`).addEventListener('mousedown', function(){
             select_circle = idx
         })
     })
@@ -105,9 +107,9 @@ const draw_contours = (e) => {
 const draw_text = (e) => {
     let tagString =
         `<text
-            id='${info.id}'
-            x='${info.x}'
-            y='${info.y}'
+            id='t-${info.id}'
+            x='${info.x - 10}'
+            y='${info.y - 10}'
 
         >${info.text}</text>`
         document.getElementById('svg').appendChild(parseSVG(tagString))
@@ -129,7 +131,7 @@ const drawPolygon = (info) => {
 const draw_circle = (info) => {
     let tagString =
         `<circle
-            id='${info.id}'
+            id='c-${info.id}'
             cx='${info.x}'
             cy='${info.y}'
             fill='${info.fill}'

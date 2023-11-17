@@ -16,8 +16,10 @@ window.addEventListener('mousemove', function(e){
         X = e.layerX
         Y = e.layerY
 
-        $(`#${select_circle}`).attr("cx", X)
-        $(`#${select_circle}`).attr("cy", Y)
+        $(`#c-${select_circle}`).attr("cx", X)
+        $(`#c-${select_circle}`).attr("cy", Y)
+        $(`#t-${select_circle}`).attr("x", X - 10)
+        $(`#t-${select_circle}`).attr("y", Y - 10)
     }
 })
 
