@@ -5,6 +5,7 @@ let select_circle = -1
 let joints = []
 let joint_label = []
 let contours = []
+let gif_name = ""
 let width_rate = 1
 let height_rate = 1
 
@@ -34,6 +35,26 @@ const get_skeleton = () => {
     })
 }
 
+const make_gif = (gif_name) => {
+    var form = new FormData();
+
+    form.append("gif_name", JSON.stringify({"gif_name":gif_name}))
+    form.append("contour", JSON.stringify({"contour":contours}))
+    form.append("joint", JSON.stringify({"joint":joints}))
+
+    $.ajax({
+        type:"POST",
+        url:"/make_gif",
+        data:form,
+        dataType:"json",
+        processData : false,
+        contentType : false,
+        success:function(result){
+            console.log("ASD")
+        }
+    })
+}
+
 const predict_sam = () => {
     var form = new FormData();
     const req_joints = {
@@ -55,7 +76,6 @@ const predict_sam = () => {
         contentType : false,
         success:function(result){
             contours = result.contours
-            console.log(contours)
             draw_contours()
         }
     })

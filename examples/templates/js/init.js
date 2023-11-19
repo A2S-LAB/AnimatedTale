@@ -76,10 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
         gifElement.classList.add('selected');
 
         // Extract the GIF name from the image source
-        const gifName = gifElement.getAttribute('data-name');
-
-        // Update the hidden input with the selected GIF name
-        document.getElementById('selectedGifName').value = gifName;
+        gif_name = gifElement.getAttribute('data-name');
     }
 
     // Add click event listeners to each GIF

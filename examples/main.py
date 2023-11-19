@@ -112,6 +112,26 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
 
     return templates.TemplateResponse("mask.html", {"request": request})
 
+@app.post("/make_gif")
+async def make_gif(
+    gif_name: str = Form(...),
+    contour: List = Form(...),
+    joint: List = Form(...)
+) -> None:
+    print(gif_name)
+    print(contour)
+    print(joint)
+    target_dir = "web_test/"
+    motion_cfg_fn = f'config/motion/{gif_name}.yaml'
+    if gif_name == 'hi' or gif_name == 'hurray' or gif_name =='jelly':
+        retarget_file = 'cmu1_pfp_copy'
+    elif gif_name == 'jesse_dance':
+        retarget_file = 'mixamo_fff'
+    elif gif_name == 'jumping_jacks':
+        retarget_file = 'cmu1_pfp'
+    else:
+        retarget_file = 'fair1_ppf'
+
 @app.get("/mask")
 async def mask(request: Request):
     return templates.TemplateResponse("mask.html", {"request": request})
@@ -120,7 +140,7 @@ async def mask(request: Request):
 async def joint_overlay(request: Request):
     return templates.TemplateResponse("joint_overlay.html", {"request": request})
 
-@app.post("/make_gif")
+@app.post("/make_gif1")
 async def make_gif(gif_name: str = Form(...)):
     target_dir = "web_test/"
     motion_cfg_fn = f'config/motion/{gif_name}.yaml'
