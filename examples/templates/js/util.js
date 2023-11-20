@@ -57,7 +57,8 @@ const make_gif = () => {
         processData : false,
         contentType : false,
         success:function(result){
-            console.log("ASD")
+            console.log(result)
+            if(result == 'done') window.location.href = 'http://localhost:8887/exhibit'
         }
     })
 }

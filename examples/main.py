@@ -51,6 +51,14 @@ class upload_result(BaseModel):
     shape : List[int]
 
 
+
+@app.get("/background_count")
+async def background_count(request: Request):
+    directory = 'web_contents/background'
+    files = os.listdir(directory)
+
+    return files
+
 @app.post("/process_skeleton", response_model=None)
 async def process_upload(file: UploadFile = File(...)) -> upload_result:
     print(f"[INFO] Process skeleton")
@@ -115,7 +123,7 @@ async def make_gif(
     gif_name: str = Form(...),
     contour: str = Form(...),
     joint: str = Form(...)
-) -> None:
+) -> str:
     print("[INFO] Make gif")
     gif_name = json.loads(gif_name)['gif_name']
     contours = json.loads(contour)['contour']
@@ -153,6 +161,8 @@ async def make_gif(
     save_joint(joints, shape, target_dir)
 
     annotations_to_animation(target_dir, motion_cfg_fn, retarget_cfg_fn)
+
+    return 'done'
 
 @app.get("/mask")
 async def mask(request: Request):
