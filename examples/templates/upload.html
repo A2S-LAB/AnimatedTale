@@ -41,7 +41,7 @@
             <input class="file" type="file" name="file" id="fileInput" />
             <label for="fileInput" class="btn-common btn-upload">Select</label>
             <input class="file" name="" id="submitInput" />
-            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="btn_submit(this)" style="display:none" value="0">Next</label>
+            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="btn_submit(this)" style="display:none" value=0>Next</label>
         </div>
     </div>
     <div id="submittedMessage" class="submitted-popup">
@@ -125,19 +125,20 @@
             switch(btn_type){
                 case "0":
                     get_skeleton()
-                    $(e).attr("value", "1")
                     $(e).text("Next")
                     break
                 case "1":
                     save_skeleton()
                     draw_contours()
-                    $(e).attr("value", "2")
                     mode = "segment"
                     break
                 case "2":
                     $("#canvas-gif").css("display","grid")
                     $("#canvas-image").css("display","none")
-                    $(e).attr("value", "2")
+                    button_count()
+                    break
+                case "3":
+                    make_gif()
                     break
             }
         }
@@ -153,6 +154,8 @@
             })
             $("circle").remove()
             $("text").remove()
+
+            button_count()
         }
 
     </script>

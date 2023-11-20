@@ -29,6 +29,7 @@ form {  bottom: 3vh; right: 20vw; background-color: transparent; border: none; b
 .gif-grid img { box-sizing: border-box; width: calc(100% - 16px); height: auto; display: block; padding: 8px; background: #fff; border: 1px solid #ddd; box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); transition: transform 0.2s ease, box-shadow 0.2s ease; margin: 4px; }
 .gif-grid img:hover { transform: scale(1.05); box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.3); margin: 0px; }
 .gif-grid img.active { outline: 2px solid skyblue; }
+.selected { border: 5px solid skyblue !important; box-shadow: 0 0 10px skyblue; }
 
 /* ------------- Process----------------------*/
 #processingMessage {

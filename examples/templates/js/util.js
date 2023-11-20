@@ -31,13 +31,21 @@ const get_skeleton = () => {
 
             draw_joint(result)
             contours = result.contours
+
+            button_count()
         }
     })
 }
 
-const make_gif = (gif_name) => {
+const button_count = () => {
+    let buttonVal = ($("#submitButton").attr("value") * 1) + 1
+    $("#submitButton").attr("value", buttonVal )
+}
+
+const make_gif = () => {
     var form = new FormData();
 
+    form.append("file", $("#fileInput")[0].files[0]);
     form.append("gif_name", JSON.stringify({"gif_name":gif_name}))
     form.append("contour", JSON.stringify({"contour":contours}))
     form.append("joint", JSON.stringify({"joint":joints}))
@@ -46,7 +54,6 @@ const make_gif = (gif_name) => {
         type:"POST",
         url:"/make_gif",
         data:form,
-        dataType:"json",
         processData : false,
         contentType : false,
         success:function(result){
@@ -57,12 +64,8 @@ const make_gif = (gif_name) => {
 
 const predict_sam = () => {
     var form = new FormData();
-    const req_joints = {
-        "joints" : joints
-    }
-    const req_labels = {
-        "labels" : joint_label
-    }
+    const req_joints = { "joints" : joints }
+    const req_labels = { "labels" : joint_label }
     form.append("file", $("#fileInput")[0].files[0])
     form.append("joints", JSON.stringify(req_joints))
     form.append("labels", JSON.stringify(req_labels))

@@ -15,7 +15,7 @@ from pathlib import Path
 import logging
 
 from annotations_to_animation import annotations_to_animation
-from utils import auto_bbox, predict_mask, predict_joint
+from utils import auto_bbox, predict_mask, predict_joint, save_texture, save_joint, contour_to_mask
 
 from segment_anything import sam_model_registry, SamPredictor
 
@@ -50,9 +50,6 @@ class upload_result(BaseModel):
     joint_text : List[str]
     shape : List[int]
 
-class predict_sam(BaseModel):
-    image : str
-    joints : List[int]
 
 @app.post("/process_skeleton", response_model=None)
 async def process_upload(file: UploadFile = File(...)) -> upload_result:
@@ -64,10 +61,10 @@ async def process_upload(file: UploadFile = File(...)) -> upload_result:
     img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
 
     joints, joint_text = predict_joint(img, target_dir + file.filename, target_dir)
-    contours = await predict_mask(sam, img, joints)
+    contours, img_shape = await predict_mask(sam, img, joints)
 
     return {
-        "shape": img.shape[:2][::-1],
+        "shape": img_shape[:2][::-1],
         "joints": joints,
         "joint_text": joint_text,
         "contours": contours
@@ -87,10 +84,10 @@ async def process_sam(
 
     joints = np.array(json.loads(joints)["joints"])
     labels = np.array(json.loads(labels)["labels"])
-    contours = await predict_mask(sam, img, joints, labels)
+    contours, img_shape = await predict_mask(sam, img, joints, labels)
 
     return {
-        "shape": img.shape[:2][::-1],
+        "shape": img_shape[:2][::-1],
         "joints": None,
         "joint_text" : None,
         "contours": contours
@@ -114,23 +111,48 @@ async def process_upload(request: Request, file: UploadFile = File(...)):
 
 @app.post("/make_gif")
 async def make_gif(
+    file: UploadFile = File(...),
     gif_name: str = Form(...),
-    contour: List = Form(...),
-    joint: List = Form(...)
+    contour: str = Form(...),
+    joint: str = Form(...)
 ) -> None:
-    print(gif_name)
-    print(contour)
-    print(joint)
+    print("[INFO] Make gif")
+    gif_name = json.loads(gif_name)['gif_name']
+    contours = json.loads(contour)['contour']
+    joints = json.loads(joint)['joint']
+
     target_dir = "web_test/"
     motion_cfg_fn = f'config/motion/{gif_name}.yaml'
-    if gif_name == 'hi' or gif_name == 'hurray' or gif_name =='jelly':
+    if gif_name == 'hi' or gif_name == 'hurray' or gif_name =='jelly' or gif_name =='lala':
         retarget_file = 'cmu1_pfp_copy'
-    elif gif_name == 'jesse_dance':
+    elif gif_name == 'jesse_dance' or gif_name =='jazz':
         retarget_file = 'mixamo_fff'
     elif gif_name == 'jumping_jacks':
         retarget_file = 'cmu1_pfp'
+    elif gif_name == 'sun' or gif_name == 'waltz_f':
+        retarget_file = 'git'
     else:
         retarget_file = 'fair1_ppf'
+
+    retarget_cfg_fn = f'config/retarget/{retarget_file}.yaml'
+
+    img = await file.read()
+    img = np.frombuffer(img, dtype=np.uint8)
+    img = cv2.imdecode(img, cv2.IMREAD_COLOR)[:, :, ::-1]  # RGB
+
+    #save texture
+    print("[INFO] Save texture")
+    shape = await save_texture(img, target_dir)
+
+    #save mask
+    print("[INFO] Contour to mask")
+    contour_to_mask(contours, shape)
+
+    #save joint
+    print("[INFO] Save joint")
+    save_joint(joints, shape, target_dir)
+
+    annotations_to_animation(target_dir, motion_cfg_fn, retarget_cfg_fn)
 
 @app.get("/mask")
 async def mask(request: Request):

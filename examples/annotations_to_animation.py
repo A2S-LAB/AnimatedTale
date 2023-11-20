@@ -8,6 +8,8 @@ import animated_drawings.render
 import logging
 from pathlib import Path
 
+from datetime import datetime
+
 import yaml
 from pkg_resources import resource_filename
 
@@ -25,12 +27,17 @@ def annotations_to_animation(char_anno_dir: str, motion_cfg_fn: str, retarget_cf
         'retarget_cfg': str(Path(retarget_cfg_fn).resolve())
     }
 
+    now = datetime.now()
+
+    # 형식화하여 시간 출력
+    file_name = now.strftime("%H%M%S")
+
     # create mvc config
     mvc_cfg = {
         'scene': {'ANIMATED_CHARACTERS': [animated_drawing_dict]},  # add the character to the scene
         'controller': {
             'MODE': 'video_render',  # 'video_render' or 'interactive'
-            'OUTPUT_VIDEO_PATH': str(Path(char_anno_dir, 'video.gif').resolve())},  # set the output location
+            'OUTPUT_VIDEO_PATH': str(Path(char_anno_dir, f'../web_contents/exhibit/video_{file_name}.gif').resolve())},  # set the output location
         'view':{
             'USE_MESA': True}
     }

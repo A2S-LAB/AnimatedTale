@@ -8,7 +8,6 @@ import yaml
 from typing import List
 
 import torch
-from fastapi import UploadFile
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -198,8 +197,6 @@ async def predict_mask(
     #Pre-process
     sam.to(device=device)
 
-    test_image = img.copy()
-
     predictor = SamPredictor(sam)
     predictor.set_image(img)
 
@@ -207,8 +204,6 @@ async def predict_mask(
     if len(label) != 0:
         point_labels = np.append(point_labels, label)
 
-    print(f"label length : {len(point_labels)}")
-    print(f"joint length : {len(joint)}")
     print(f"[INFO] image shape : {np.array(img).shape}")
 
     #Predict mask as SAM
@@ -232,7 +227,8 @@ async def predict_mask(
     for idx, val in enumerate(contours[0]):
         if len(val) > max_len: max_len = idx
 
-    return contours[0][max_len].tolist()
+    print(f"[INFO] image shape : {np.array(img).shape}")
+    return contours[0][max_len].tolist(), np.array(img).shape
 
 def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
     # resize if needed
@@ -349,5 +345,21 @@ def save_joint(joint : List, shape: tuple, out_dir: str):
     with open(f"{out_dir}/char_cfg.yaml", 'w') as f:
         yaml.dump(char_cfg, f)
 
-def save_texture(contour: List, out_dir: str):
-   cv2.imwrite(f"{out_dir}/texture.png", img)
+async def save_texture(img: np.ndarray, out_dir: str):
+    # resize if needed
+    if np.max(img.shape) > 1000:
+        scale = 1000 / np.max(img.shape)
+        img = cv2.resize(img, (round(scale * img.shape[1]), round(scale * img.shape[0])))
+
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    cv2.imwrite(f"{out_dir}/texture.png", img)
+
+    return img.shape
+
+def contour_to_mask(contour: np.ndarray, shape: tuple):
+
+    mask = np.zeros(shape[:2], dtype=np.uint8)
+    contour = np.array(contour).squeeze()
+    cv2.fillPoly(mask, [contour], 255)
+
+    cv2.imwrite('web_test/mask.png', mask)
