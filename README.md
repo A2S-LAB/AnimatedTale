@@ -28,5 +28,5 @@ python main.py
 ```
 
 
-https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/b48b7d3f-6c5c-4101-9112-84072fc6f689
+https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/090eed1c-14ab-4b9f-88a6-fb96d8b4a45a
 
