@@ -1,7 +1,7 @@
 # AnimatedTale
 As a part of Art Korea Lab project, this project attempts to provide a useful tool for artists or content creators to make 2D animation easily.
 
-The code is based on "Animated Drawings" by Meta. https://github.com/facebookresearch/AnimatedDrawings
+The code is based on the "Animated Drawings" by Meta. https://github.com/facebookresearch/AnimatedDrawings
 
 For now, it merely has similar functionalities to the Animated Drawings Web Demo page but functions such as extracting  a bvh motion file from a video, adjusting output gif length, setting character's scale, position, and resolution will be added.
 
