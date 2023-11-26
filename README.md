@@ -30,3 +30,7 @@ python main.py
 
 https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/090eed1c-14ab-4b9f-88a6-fb96d8b4a45a
 
+## Supported by
+
+![image1](https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/2cf499f1-10c3-4fbc-9cab-27097209a466)![image2](https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/237dd3b2-ee30-4abf-9706-9a496a2234a1)
+
