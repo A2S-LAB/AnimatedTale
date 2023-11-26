@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/get_image/web_contents/AT_Logo.ico" type="image/x-icon">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <title>Animated Tale</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script src="/js/util.js"></script>
+    <script src="/js/init.js"></script>
 </head>
 <body>
     <h1 class="title">Animated Tale</h1>
@@ -15,21 +18,42 @@
     </div>
     <div class="canvas-container">
         <div class="canvas">
-            <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
+            <div id="canvas-image">
+                <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;">
+                <svg class="svg" id="svg" style="display: none"></svg>
+                <img id="btn-sam" src="/get_image/templates/css/ai.png" class="sam" style="width:4vw" onclick="predict_sam()"  />
+                <img id="toggle-mask" src="/get_image/templates/css/red_btn.png" class="mask" style="width:4vw" onclick="change_mask()" />
+                
+            </div>
+            <div class="gif-grid" id="canvas-gif" style="display: none;">
+                <img src="/get_image/web_contents/motions/hi.gif" alt="GIF 1" data-name="hi">
+                <img src="/get_image/web_contents/motions/dab.gif" alt="GIF 2", data-name="dab">
+                <img src="/get_image/web_contents/motions/hurray.gif" alt="GIF 2", data-name="hurray">
+                <img src="/get_image/web_contents/motions/jelly.gif" alt="GIF 2", data-name="jelly">
+                <img src="/get_image/web_contents/motions/jesse_dance.gif" alt="GIF 2", data-name="jesse_dance">
+                <img src="/get_image/web_contents/motions/jumping_jacks.gif" alt="GIF 2", data-name="jumping_jacks">
+                <img src="/get_image/web_contents/motions/wave_hello.gif" alt="GIF 2", data-name="wave_hello">
+                <img src="/get_image/web_contents/motions/lala.gif" alt="GIF 2", data-name="lala">
+                <img src="/get_image/web_contents/motions/sun.gif" alt="GIF 2", data-name="sun">
+                <img src="/get_image/web_contents/motions/waltz_f.gif" alt="GIF 2", data-name="waltz_f">
+                <img src="/get_image/web_contents/motions/jazz.gif" alt="GIF 2", data-name="jazz">
+                <img src="/get_image/web_contents/motions/sound.gif" alt="GIF 2", data-name="sound">
+            </div>
         </div>
+        <img id="joint-inst" src="/get_image/templates/css/joint_inst.png" class="joint_inst" style="width:23vw" />
+        <img id="mask-inst" src="/get_image/templates/css/mask_inst.png" class="mask_inst" style="width:23vw" />
+        <img id="motion-inst" src="/get_image/templates/css/motion_inst.png" class="motion_inst" style="width:23vw" />
         <div class="button-container">
-            <form action="/process_upload" enctype="multipart/form-data" method="post" id="uploadForm">
-                <input class="file" type="file" name="file" id="fileInput" />
-                <input type="submit" class="btn-common btn-submit" id="submitButton" value="Submit" style="display:none">
-            </form>
-            <label for="fileInput" class="btn-common btn-upload">Upload</label>
+            <input class="file" type="file" name="file" id="fileInput" />
+            <label for="fileInput" class="btn-common btn-upload">Select</label>
+            <input class="file" name="" id="submitInput" />
+            <label for="submitInput" class="btn-common btn-submit" id="submitButton" onclick="btn_submit(this)" style="display:none" value=0>Next</label>
         </div>
-        
     </div>
+    
     <div id="submittedMessage" class="submitted-popup">
         Submitted
     </div>
-
 
     <svg class="balloon" style="left: 5%; width: 60px; animation-delay: 1s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
     <svg class="balloon" style="right: 10%; width: 80px; animation-delay: 3s;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 3.08-3.46 7.5-7 11.5C8.46 16.5 5 12.08 5 9a7 7 0 0 1 7-7z"/><path d="M12 22s-1.5 1.5-3 0"/></svg>
@@ -62,6 +86,7 @@
             var submitButton = document.getElementById('submitButton');
             if(this.files.length > 0) {
                 submitButton.style.display = 'inline';
+                div.style.display = "none"
             } else {
                 submitButton.style.display = 'none';
             }
@@ -85,14 +110,7 @@
                     }
                 }
                 reader.readAsDataURL(file);
-                div.style.display = "none"
-                submit.style.display = "block"
-
             }
-        });
-
-        document.querySelector('input[type="submit"]').addEventListener('click', function() {
-            document.getElementById('processingMessage').style.display = "block";
         });
 
         window.onload = function() {
@@ -107,17 +125,66 @@
             }
         }
 
-        window.addEventListener(`resize`, function() {
-            const width = canvas.offsetWidth
-            const height = canvas.offsetHeight
-            const padding = 60
-            if (imgElement.width > imgElement.height){
-                imgElement.style.width = (width - padding)+ "px";
-            }else{
-                imgElement.style.height = (height - padding)+ "px";
-            }
-        });
+        const btn_submit = async (e) => {
+            btn_type = $(e).attr("value")
 
+            switch(btn_type){
+                case "0":
+                    get_skeleton()
+                    $(e).text("Next")
+                    $("#joint-inst").css("display", "block")
+                    break
+                case "1":
+                    $("#joint-inst").css("display", "none")
+                    save_skeleton()
+                    draw_contours()
+                    mode = "segment"
+                    $("#mask-inst").css("display", "block")
+                    $("#btn-sam").css("display", "block")
+                    $("#toggle-mask").css("display", "block")
+                    break
+                case "2":
+                    $("#mask-inst").css("display", "none")
+                    $("#canvas-gif").css("display","grid")
+                    $("#canvas-image").css("display","none")
+                    $("#btn-sam").css("display", "none")
+                    $("#motion-inst").css("display", "block")
+                    button_count()
+                    break
+                case "3":
+                    $("#processingMessage").show();
+                    make_gif()
+                    break
+            }
+        }
+
+        const save_skeleton = () => {
+            joints = []
+            $.each($("circle"), function(idx, val){
+                const target = $($("circle")[idx])
+                if(idx == 0){
+                    joints.push([target.attr("cx") / width_rate, target.attr("cy") / height_rate])
+                }
+                joints.push([target.attr("cx") / width_rate, target.attr("cy") / height_rate])
+            })
+            $("circle").remove()
+            $("text").remove()
+
+            button_count()
+        }
+
+        let isButtonBlue = false;
+
+        function change_mask() {
+            const toggle = document.getElementById('toggle-mask');
+            if (isButtonBlue) {
+                toggle.src = '/get_image/templates/css/red_btn.png';
+                isButtonBlue = false;
+            } else {
+                toggle.src = '/get_image/templates/css/blue_btn.png';
+                isButtonBlue = true;
+            }
+        }
 
     </script>
 </body>

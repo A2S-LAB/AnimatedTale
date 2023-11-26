@@ -8,7 +8,6 @@ import yaml
 from typing import List
 
 import torch
-from fastapi import UploadFile
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -177,7 +176,12 @@ def mask(path):
     cv2.destroyAllWindows()
     cv2.imwrite(path + '/mask.png', mask_copy)
 
-async def predict_mask(sam: modeling.sam.Sam, img:UploadFile) -> np.ndarray:
+async def predict_mask(
+        sam: modeling.sam.Sam,
+        img:np.ndarray,
+        joint:np.ndarray,
+        label:np.ndarray = []
+    ) -> np.ndarray:
 
     # ensure it's rgb
     if len(img.shape) != 3:
@@ -190,43 +194,41 @@ async def predict_mask(sam: modeling.sam.Sam, img:UploadFile) -> np.ndarray:
         scale = 1000 / np.max(img.shape)
         img = cv2.resize(img, (round(scale * img.shape[1]), round(scale * img.shape[0])))
 
-    #bbox(ndarray)
-    bbox = auto_bbox(img)
-
     #Pre-process
     sam.to(device=device)
 
     predictor = SamPredictor(sam)
     predictor.set_image(img)
 
+    point_labels = np.ones(16, dtype=np.int8)
+    if len(label) != 0:
+        point_labels = np.append(point_labels, label)
+
+    print(f"[INFO] image shape : {np.array(img).shape}")
+
     #Predict mask as SAM
     masks, _, _ = predictor.predict(
-        point_coords=None,
-        point_labels=None,
-        box=bbox[None, :],
+        point_coords=np.array(joint),
+        point_labels=point_labels,
+        box=None,
+        # box=bbox[None, :],
         multimask_output=False,
     )
 
     #Post-process
-    masks = masks.astype('uint8')
+    masks = masks.astype(np.uint8)
     masks = masks.reshape(masks.shape[-2], masks.shape[-1], 1)
-    masks = masks * 255
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
-    masks = cv2.morphologyEx(masks, cv2.MORPH_CLOSE, kernel, iterations=2)
-    cv2.imwrite("web_test/mask.png", masks)
-    return masks
+    contours = cv2.findContours(masks, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
-    #Loading image
-    # img = cv2.imread(img_path)
-    
-    # ensure it's rgb
-    if len(img.shape) != 3:
-        msg = f'image must have 3 channels (rgb). Found {len(img.shape)}'
-        logging.critical(msg)
-        assert False, msg
+    max_len = 0
+    for idx, val in enumerate(contours[0]):
+        if len(val) > max_len: max_len = idx
 
+    print(f"[INFO] image shape : {np.array(img).shape}")
+    return contours[0][max_len].tolist(), np.array(img).shape
+
+def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List:
     # resize if needed
     if np.max(img.shape) > 1000:
         scale = 1000 / np.max(img.shape)
@@ -260,60 +262,102 @@ def predict_joint(img: np.ndarray, img_path: str, out_dir: str) -> List[int]:
     kpts = np.array(pose_results[0]['keypoints'])[:, :2]
 
     # use them to build character skeleton rig
-    skeleton = []
-    skeleton.append({'loc' : [round(x) for x in (kpts[11]+kpts[12])/2], 'name': 'root'          , 'parent': None})
-    skeleton.append({'loc' : [round(x) for x in (kpts[11]+kpts[12])/2], 'name': 'hip'           , 'parent': 'root'})
-    skeleton.append({'loc' : [round(x) for x in (kpts[5]+kpts[6])/2  ], 'name': 'torso'         , 'parent': 'hip'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[0]             ], 'name': 'neck'          , 'parent': 'torso'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[6]             ], 'name': 'right_shoulder', 'parent': 'torso'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[8]             ], 'name': 'right_elbow'   , 'parent': 'right_shoulder'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[10]            ], 'name': 'right_hand'    , 'parent': 'right_elbow'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[5]             ], 'name': 'left_shoulder' , 'parent': 'torso'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[7]             ], 'name': 'left_elbow'    , 'parent': 'left_shoulder'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[9]             ], 'name': 'left_hand'     , 'parent': 'left_elbow'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[12]            ], 'name': 'right_hip'     , 'parent': 'root'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[14]            ], 'name': 'right_knee'    , 'parent': 'right_hip'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[16]            ], 'name': 'right_foot'    , 'parent': 'right_knee'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[11]            ], 'name': 'left_hip'      , 'parent': 'root'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[13]            ], 'name': 'left_knee'     , 'parent': 'left_hip'})
-    skeleton.append({'loc' : [round(x) for x in  kpts[15]            ], 'name': 'left_foot'     , 'parent': 'left_knee'})
+    # skeleton = []
+    # skeleton.append({'loc' : [round(x) for x in (kpts[11]+kpts[12])/2], 'name': 'root'          , 'parent': None})
+    # skeleton.append({'loc' : [round(x) for x in (kpts[11]+kpts[12])/2], 'name': 'hip'           , 'parent': 'root'})
+    # skeleton.append({'loc' : [round(x) for x in (kpts[5]+kpts[6])/2  ], 'name': 'torso'         , 'parent': 'hip'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[0]             ], 'name': 'neck'          , 'parent': 'torso'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[6]             ], 'name': 'right_shoulder', 'parent': 'torso'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[8]             ], 'name': 'right_elbow'   , 'parent': 'right_shoulder'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[10]            ], 'name': 'right_hand'    , 'parent': 'right_elbow'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[5]             ], 'name': 'left_shoulder' , 'parent': 'torso'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[7]             ], 'name': 'left_elbow'    , 'parent': 'left_shoulder'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[9]             ], 'name': 'left_hand'     , 'parent': 'left_elbow'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[12]            ], 'name': 'right_hip'     , 'parent': 'root'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[14]            ], 'name': 'right_knee'    , 'parent': 'right_hip'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[16]            ], 'name': 'right_foot'    , 'parent': 'right_knee'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[11]            ], 'name': 'left_hip'      , 'parent': 'root'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[13]            ], 'name': 'left_knee'     , 'parent': 'left_hip'})
+    # skeleton.append({'loc' : [round(x) for x in  kpts[15]            ], 'name': 'left_foot'     , 'parent': 'left_knee'})
 
     output = []
-    output.append((kpts[11]+kpts[12])/2)
-    output.append((kpts[11]+kpts[12])/2)
-    output.append((kpts[5]+kpts[6])/2)
-    output.append(kpts[0])
-    output.append(kpts[6])
-    output.append(kpts[8])
-    output.append(kpts[10])
-    output.append(kpts[5])
-    output.append(kpts[7])
-    output.append(kpts[9])
-    output.append(kpts[12])
-    output.append(kpts[14])
-    output.append(kpts[16])
-    output.append(kpts[11])
-    output.append(kpts[13])
-    output.append(kpts[15])
+    output.append(list((kpts[11]+kpts[12])/2))
+    output.append(list((kpts[11]+kpts[12])/2))
+    output.append(list((kpts[5]+kpts[6])/2))
+    output.append(list(kpts[0]))
+    output.append(list(kpts[6]))
+    output.append(list(kpts[8]))
+    output.append(list(kpts[10]))
+    output.append(list(kpts[5]))
+    output.append(list(kpts[7]))
+    output.append(list(kpts[9]))
+    output.append(list(kpts[12]))
+    output.append(list(kpts[14]))
+    output.append(list(kpts[16]))
+    output.append(list(kpts[11]))
+    output.append(list(kpts[13]))
+    output.append(list(kpts[15]))
+
+    joint_text = ['root', 'hip', 'torso', 'neck', 'right_shourlder', 'right_elbow',
+                  'right_hand','left_shourlder', 'left_elbow', 'left_hand',
+                  'right_hip', 'right_knee', 'right_foot',
+                  'left_hip', 'left_knee', 'left_foot',
+                ]
 
     # create the character config dictionary
-    char_cfg = {'skeleton': skeleton, 'height': img.shape[0], 'width': img.shape[1]}
+    # char_cfg = {'skeleton': skeleton, 'height': img.shape[0], 'width': img.shape[1]}
+
+    # dump character config to yaml
+    # with open(f"{out_dir}/char_cfg.yaml", 'w') as f:
+    #     yaml.dump(char_cfg, f)
+
+    # convert texture to RGBA and save
+    # img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+    # cv2.imwrite(f"{out_dir}/texture.png", img)
+
+    return output, joint_text
+
+def save_joint(joint : List, shape: tuple, out_dir: str):
+    skeleton = []
+    skeleton.append({'loc' : [round(x) for x in joint[0]],  'name': 'root'          , 'parent': None})
+    skeleton.append({'loc' : [round(x) for x in joint[1]],  'name': 'hip'           , 'parent': 'root'})
+    skeleton.append({'loc' : [round(x) for x in joint[2]],  'name': 'torso'         , 'parent': 'hip'})
+    skeleton.append({'loc' : [round(x) for x in joint[3]],  'name': 'neck'          , 'parent': 'torso'})
+    skeleton.append({'loc' : [round(x) for x in joint[4]],  'name': 'right_shoulder', 'parent': 'torso'})
+    skeleton.append({'loc' : [round(x) for x in joint[5]],  'name': 'right_elbow'   , 'parent': 'right_shoulder'})
+    skeleton.append({'loc' : [round(x) for x in joint[6]],  'name': 'right_hand'    , 'parent': 'right_elbow'})
+    skeleton.append({'loc' : [round(x) for x in joint[7]],  'name': 'left_shoulder' , 'parent': 'torso'})
+    skeleton.append({'loc' : [round(x) for x in joint[8]],  'name': 'left_elbow'    , 'parent': 'left_shoulder'})
+    skeleton.append({'loc' : [round(x) for x in joint[9]],  'name': 'left_hand'     , 'parent': 'left_elbow'})
+    skeleton.append({'loc' : [round(x) for x in joint[10]], 'name': 'right_hip'     , 'parent': 'root'})
+    skeleton.append({'loc' : [round(x) for x in joint[11]], 'name': 'right_knee'    , 'parent': 'right_hip'})
+    skeleton.append({'loc' : [round(x) for x in joint[12]], 'name': 'right_foot'    , 'parent': 'right_knee'})
+    skeleton.append({'loc' : [round(x) for x in joint[13]], 'name': 'left_hip'      , 'parent': 'root'})
+    skeleton.append({'loc' : [round(x) for x in joint[14]], 'name': 'left_knee'     , 'parent': 'left_hip'})
+    skeleton.append({'loc' : [round(x) for x in joint[15]], 'name': 'left_foot'     , 'parent': 'left_knee'})
+
+     # create the character config dictionary
+    char_cfg = {'skeleton': skeleton, 'height': shape[0], 'width': shape[1]}
 
     # dump character config to yaml
     with open(f"{out_dir}/char_cfg.yaml", 'w') as f:
         yaml.dump(char_cfg, f)
 
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
-    # create joint viz overlay for inspection purposes
-    joint_overlay = img.copy()
-    for idx,joint in enumerate(skeleton):
-        x, y = joint['loc']
-        name = joint['name']
-        cv2.circle(joint_overlay, (int(x), int(y)), 5, (0, 0, 0), 5)
-        cv2.putText(joint_overlay, str(idx), (int(x), int(y+15)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, 2)
-    cv2.imwrite(f"{out_dir}/joint_overlay.png", joint_overlay)
+async def save_texture(img: np.ndarray, out_dir: str):
+    # resize if needed
+    if np.max(img.shape) > 1000:
+        scale = 1000 / np.max(img.shape)
+        img = cv2.resize(img, (round(scale * img.shape[1]), round(scale * img.shape[0])))
 
-    # convert texture to RGBA and save
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     cv2.imwrite(f"{out_dir}/texture.png", img)
 
-    return output
+    return img.shape
+
+def contour_to_mask(contour: np.ndarray, shape: tuple):
+
+    mask = np.zeros(shape[:2], dtype=np.uint8)
+    contour = np.array(contour).squeeze()
+    cv2.fillPoly(mask, [contour], 255)
+
+    cv2.imwrite('web_test/mask.png', mask)

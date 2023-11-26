@@ -4,6 +4,7 @@ body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif; backg
 .canvas-container { position: relative; display: flex; justify-content: center; align-items: center; background-color: rgba(255, 255, 255, 0.5); flex-direction: column; margin-bottom: 5vh; width: 100%; padding: 2vh 0; }
 .canvas { position: relative; width: 40vw; height: 50vh; background-color: white; border: 0.1vw solid #ccc; box-shadow: 0 0.4vw 0.8vw rgba(0, 0, 0, 0.1); padding: 2vh; text-align: center; margin-top: 1vh; border-radius: 1.5vw; }
 
+.svg{position: absolute; top: 2vh; left: 2vh}
 /* -----------------------Buttons-------------------------------*/
 .btn-common { font-size: 1.5vw; padding: 1.5vh 2vw; margin: 0 0.5vw; border: 0.08vw solid #ccc; border-radius: 0.4vw; cursor: pointer; transition: background-color 0.3s; min-width: 20vw; text-align: center; }
 .btn-create { background-color: #333; color: #FFF; }
@@ -15,6 +16,9 @@ body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif; backg
 .btn-submit { background-color: #87CEFA; border-color: #87CEFA; color: white; box-shadow: 0 0.3vw 0.6vw rgba(0, 0, 0, 0.1); width: auto; }
 .btn-submit:hover { background-color: #B0E0E6; }
 
+.sam {position: absolute; right: 2vw; bottom: 2vw; display: none; }
+.mask {position: absolute; right: 1.9vw; bottom: 6.5vw; display: none; }
+
 .btn-prev { position: absolute; left: 12.3vw; bottom: 1vw; font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif; font-size: 1vw; text-decoration: none; padding: 1vh 2vw; border: 0.08vw solid #ccc; border-radius: 0.4vw; cursor: pointer; background-color: #87CEFA; color: white; transition: background-color 0.3s; }
 .btn-prev:hover { background-color: #B0E0E6; }
 
@@ -23,11 +27,23 @@ form {  bottom: 3vh; right: 20vw; background-color: transparent; border: none; b
 .file { display:none; }
 .upload-btn-wrapper input[type=file] { font-size: 1.1vw; position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2; opacity: 0; }
 
+/* ------------- instruction imagse ----------------------*/
+.joint_inst {position: absolute; right: 5vw; bottom: 7vw; display: none; }
+.mask_inst {position: absolute; right: 5vw; bottom: 6vw; display: none; }
+.motion_inst {position: absolute; right: 5vw; bottom: 6vw; display: none; }
+
+/* ------------- GIF ----------------------*/
+.gif-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; padding: 1px; overflow-y: auto; max-height: 50vh; width: 100%; }
+.gif-grid img { box-sizing: border-box; width: calc(100% - 16px); height: auto; display: block; padding: 8px; background: #fff; border: 1px solid #ddd; box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2); transition: transform 0.2s ease, box-shadow 0.2s ease; margin: 4px; }
+.gif-grid img:hover { transform: scale(1.05); box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.3); margin: 0px; }
+.gif-grid img.active { outline: 2px solid skyblue; }
+.selected { border: 5px solid skyblue !important; box-shadow: 0 0 10px skyblue; }
+
 /* ------------- Process----------------------*/
 #processingMessage {
     position: absolute;
-    bottom: 3vw;
-    left: 20vw;
+    bottom: 11vw;
+    left: 17vw;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 5px;
     border-radius: 5px;
