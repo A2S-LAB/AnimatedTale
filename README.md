@@ -1,5 +1,5 @@
 # AnimatedTale
-As a part of Art Korea Lab project, this project attempts to provide a useful tool for artists or content creators to make 2D animation easily.
+As a part of Arts Korea Lab project, this project attempts to provide a useful tool for artists or content creators to make 2D animation easily.
 
 The code is based on the "Animated Drawings" by Meta. https://github.com/facebookresearch/AnimatedDrawings
 
@@ -39,7 +39,7 @@ https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/090eed1c-14ab-4b9f-88a6
 ## Supported by
 
 <p align="left">
-  <img src="https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/2cf499f1-10c3-4fbc-9cab-27097209a466" width="280" height="200">
+  <img src="https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/2cf499f1-10c3-4fbc-9cab-27097209a466" width="260" height="200">
   <img src="https://github.com/Hyo1-Lee/AnimatedTale/assets/51254788/237dd3b2-ee30-4abf-9706-9a496a2234a1" width="200" height="200">
 </p>
 
