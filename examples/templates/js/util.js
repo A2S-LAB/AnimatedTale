@@ -58,7 +58,7 @@ const make_gif = () => {
         contentType : false,
         success:function(result){
             console.log(result)
-            if(result == 'done') window.location.href = 'http://172.30.1.84:8888/exhibit'
+            if(result == 'done') window.location.href = 'http://localhost:8888/exhibit'
         }
     })
 }

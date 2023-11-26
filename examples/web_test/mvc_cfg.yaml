@@ -1,0 +1,10 @@
+controller:
+  MODE: video_render
+  OUTPUT_VIDEO_PATH: /home/dcvlab/dcv/Coco/aa/AnimatedTale/examples/web_contents/exhibit/video_1.gif
+scene:
+  ANIMATED_CHARACTERS:
+  - character_cfg: /home/dcvlab/dcv/Coco/aa/AnimatedTale/examples/web_test/char_cfg.yaml
+    motion_cfg: /home/dcvlab/dcv/Coco/aa/AnimatedTale/examples/config/motion/jelly.yaml
+    retarget_cfg: /home/dcvlab/dcv/Coco/aa/AnimatedTale/examples/config/retarget/cmu1_pfp_copy.yaml
+view:
+  USE_MESA: true
